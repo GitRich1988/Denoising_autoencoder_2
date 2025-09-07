@@ -1,0 +1,10 @@
+[
+{
+	"TrainingBatchSize": "1",
+	"NumEpochs": "1",
+	"ActivationFunction": "relu",
+	"LossFunction": "mean_squared_error",
+	"Optimizer": "adam",
+	"TestingBatchSize": "1"	
+}
+]

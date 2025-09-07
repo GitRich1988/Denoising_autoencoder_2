@@ -1,0 +1,19 @@
+# Ignore everything
+*
+
+myenv/
+Training_info/Model_records/
+.vs/
+
+# But keep .gitignore itself (optional)
+!.gitignore
+
+# Keep solution file (optional if needed)
+!*.sln
+
+# Track these folders and all their contents
+!src/
+!src/**
+!Training_info/
+!Training_info/**
+
