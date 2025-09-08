@@ -1,6 +1,7 @@
 # src/myDataSetMGR/myDataSetMGR.py
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
+from src.myCircleParameters.myCircleParameters import myCircleParameters
 l_ProjectInfo = myProjectInfo()
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1" # this is an attempt to ensure a CNN trains to identical weights each time I run the program
@@ -515,8 +516,6 @@ class myModelMGR:
             l_TestingBatchSize = 1
 
             #"""
-            #l_TestingExampleRaw = l_GeneralFunctions.ReadFileIntoDataframe(self.m_FilePathsRawData[a_ExampleIndex])
-            #l_TestingExampleRaw = l_GeneralFunctions.ReadFileIntoPandasDataframe(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex])
             l_RawDataFullPath = self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex]
             l_TestingExampleRaw = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_RawDataFullPath, a_Header=None)
             print("l_TestingExampleRaw.shape:\n", l_TestingExampleRaw.shape)
@@ -524,14 +523,11 @@ class myModelMGR:
             l_TestingExampleRaw = l_TestingExampleRaw.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
             l_TestingExampleRaw = l_TestingExampleRaw.to_numpy()
             l_TestingExampleRaw = l_TestingExampleRaw.reshape( 1
-                                                             #, self.m_NumRowsPerExampleDataFrame
                                                              , self.m_DataSetMGR.m_NumRowsPerExampleDataFrame
                                                              , self.m_DataSetMGR.m_NumFeaturesPerPoint)
             #l_TestingExampleRaw = tf.convert_to_tensor(l_TestingExampleRaw, dtype=tf.float64)
             l_TestingExampleRaw = tf.convert_to_tensor(l_TestingExampleRaw, dtype=tf.float32)
             #"""
-
-            #with tf.device('/GPU:0'):
 
             l_DateTimeStampCurrentTest = l_GeneralFunctions.GetCurrentDateTimeStamp()
 
@@ -620,6 +616,10 @@ class myModelMGR:
             print("type(l_TestingExampleRaw):", type(l_TestingExampleRaw))
             print("type(l_TestingExampleRCNom):", type(l_TestingExampleRCNom))
             print("type(l_DenoisedPrediction):", type(l_DenoisedPrediction))
+
+            self.SetAndWriteFittedParameters( l_TestingExampleRaw
+                                            , l_TestingExampleRCNom
+                                            , l_DenoisedPrediction)
 
             """
             # Calculate and write results for the current testing example
@@ -1137,5 +1137,61 @@ class myModelMGR:
 
         with open(l_FullPathOutput, "w") as file:
             json.dump(a_JSON, file, indent=2)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def SetAndWriteFittedParameters( self
+                                   , a_TestingExampleRaw
+                                   , a_TestingExampleRCNom
+                                   , a_DenoisedPrediction):
+
+        # RCNom
+        l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
+        l_CircleParametersRCNom = myCircleParameters.myCircleParameters(l_TestingExampleRCNom)
+        l_CircleParametersRCNom.SetXYRadialDistances(0, 0)
+        l_CircleParametersRCNom.SetCircleParameters()
+
+        # Raw
+        l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
+        l_CircleParametersRaw = myCircleParameters.myCircleParameters(l_TestingExampleRaw)
+        l_CircleParametersRaw.SetRootMeanSquaredDeviation( l_CircleParametersRaw.m_PointData
+                                                         , l_TestingExampleRCNom)
+        l_CircleParametersRaw.SetXYRadialDistances(0, 0)
+        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
+        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
+        l_CircleParametersRaw.SetCircleParameters()
+
+        # Denoised
+        l_DenoisedPrediction = a_DenoisedPrediction[0]
+        l_CircleParametersDenoised = myCircleParameters.myCircleParameters(l_DenoisedPrediction)
+        l_CircleParametersDenoised.SetRootMeanSquaredDeviation( l_CircleParametersDenoised.m_PointData
+                                                                , l_TestingExampleRCNom)
+        l_CircleParametersDenoised.SetXYRadialDistances(0, 0)
+        l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
+        l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
+        l_CircleParametersDenoised.SetCircleParameters()
+
+        print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
+        print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
+        print("l_CircleParametersDenoised.m_Radius:           ", l_CircleParametersDenoised.m_Radius)
+        print("l_CircleParametersRaw.m_XYRMSDevFromRCNom:     ", l_CircleParametersRaw.m_XYRMSDevFromRCNom)
+        print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_XYRMSDevFromRCNom)
+
+        self.WriteResultsForCNNParameters( a_CNNParameters
+                                            , l_CircleParametersRaw
+                                            , l_CircleParametersRCNom
+                                            , l_CircleParametersDenoised
+                                            , 1 #<-- l_TotalTestingExamplesHandled
+                                            , a_ExampleIndex
+                                            , self.m_DateTimeStampOverall
+                                            , l_DateTimeStampCurrentTest
+                                            , a_ModelBuildingTime
+                                            , a_ModelTrainingTime
+                                            , l_DenoisingTimeTaken
+                                            , l_DirCNNIndex)
+
+
+
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
