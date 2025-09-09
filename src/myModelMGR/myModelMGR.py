@@ -1,8 +1,9 @@
 # src/myDataSetMGR/myDataSetMGR.py
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
-from src.myCircleParameters.myCircleParameters import myCircleParameters
 l_ProjectInfo = myProjectInfo()
+from src.myCircleParameters.myCircleParameters import myCircleParameters 
+
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1" # this is an attempt to ensure a CNN trains to identical weights each time I run the program
 import re
@@ -1148,13 +1149,16 @@ class myModelMGR:
 
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
-        l_CircleParametersRCNom = myCircleParameters.myCircleParameters(l_TestingExampleRCNom)
+        #l_CircleParametersRCNom = myCircleParameters.myCircleParameters()
+        l_CircleParametersRCNom = myCircleParameters()
+        l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetXYRadialDistances(0, 0)
         l_CircleParametersRCNom.SetCircleParameters()
 
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
-        l_CircleParametersRaw = myCircleParameters.myCircleParameters(l_TestingExampleRaw)
+        l_CircleParametersRaw = myCircleParameters()
+        l_CircleParametersRaw.Initialise(l_TestingExampleRaw)
         l_CircleParametersRaw.SetRootMeanSquaredDeviation( l_CircleParametersRaw.m_PointData
                                                          , l_TestingExampleRCNom)
         l_CircleParametersRaw.SetXYRadialDistances(0, 0)
