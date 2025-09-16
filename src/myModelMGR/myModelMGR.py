@@ -33,6 +33,7 @@ class myModelMGR:
         self.m_RandomSeedNumpy = 42
         self.m_RandomSeedRandom = 42
         self.m_RandomSeedTensorflow = 42
+        self.m_NominalRadius = 1
 
         self.Initialise()
 
@@ -1162,8 +1163,9 @@ class myModelMGR:
         l_CircleParametersRaw.SetRootMeanSquaredDeviation( l_CircleParametersRaw.m_PointData
                                                          , l_TestingExampleRCNom)
         l_CircleParametersRaw.SetXYRadialDistances(0, 0)
+        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromTrueNom(l_CircleParametersRaw.m_PointData, self.m_NominalRadius)
         l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
-        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
+        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromRCNom(l_TestingExampleRaw, l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircleParameters()
 
         # Denoised

@@ -72,27 +72,25 @@ class myCircleParameters:
 
     #--------------------------------------------------------------------------
     def SetRootMeanSquaredDeviation( self
-                                   , a_CircleParametersRaw.m_PointData
-                                   , a_Radius
-                                   , a_NominalCentreX
-                                   , a_NominalCentreY):
+                                   , a_PointData
+                                   , a_PointDataForComparison):
        
-        l_SumRadialDifferenceSquared = 0
-        for l_PointIndex in range(0, len(a_CircleParametersRaw.m_PointData)):
-            l_X = a_CircleParametersRaw.m_PointData[l_PointIndex, 0]
-            l_Y = a_CircleParametersRaw.m_PointData[l_PointIndex, 1]
+        l_SumRSquared =  0
+        for l_PointIndex in range(0, len(a_PointData)):
+            l_X = a_PointData[l_PointIndex, 0]
+            l_Y = a_PointData[l_PointIndex, 1]
 
-            l_DiffX = l_X - a_NominalCentreX
-            l_DiffY = l_Y - a_NominalCentreY 
+            l_CompX = a_PointDataForComparison[l_PointIndex, 0]
+            l_CompY = a_PointDataForComparison[l_PointIndex, 1]
+
+            l_DiffX = l_X - l_CompX
+            l_DiffY = l_Y - l_CompY
             l_DiffXSquared = l_DiffX * l_DiffX
             l_DiffYSquared = l_DiffY * l_DiffY
             l_RSquared = l_DiffXSquared + l_DiffYSquared
-            l_R = math.sqrt(l_RSquared)
-            l_RadialDifference = l_R - a_Radius
-            l_RadialDifferenceSquared = l_RadialDifference * l_RadialDifference
-            l_SumRadialDifferenceSquared += l_RadialDifferenceSquared
+            l_SumRSquared += l_RSquared
 
-        l_MeanRadialDifferenceSquared = l_SumRadialDifferenceSquared / len(a_CircleParametersRaw.m_PointData)
+        l_MeanRadialDifferenceSquared = l_SumRSquared / len(a_PointData)
         l_RMS = math.sqrt(l_MeanRadialDifferenceSquared)
 
         return l_RMS
@@ -101,14 +99,14 @@ class myCircleParameters:
 
     #--------------------------------------------------------------------------
     def SetXYRadialMean( self
-                       , a_CircleParametersRaw.m_PointData
+                       , a_PointData
                        , a_NominalCentreX
                        , a_NominalCentreY
                        , a_XYRadialMean):
         l_SumR = 0
-        for l_PointIndex in range(0, len(a_CircleParametersRaw.m_PointData)):
-            l_X = a_CircleParametersRaw.m_PointData[l_PointIndex, 0]
-            l_Y = a_CircleParametersRaw.m_PointData[l_PointIndex, 1]
+        for l_PointIndex in range(0, len(a_PointData)):
+            l_X = a_PointData[l_PointIndex, 0]
+            l_Y = a_PointData[l_PointIndex, 1]
 
             l_DiffX = l_X - a_NominalCentreX
             l_DiffY = l_Y - a_NominalCentreY 
@@ -118,7 +116,7 @@ class myCircleParameters:
             l_R = math.sqrt(l_RSquared)
             l_SumR += l_R
 
-        a_XYRadialMean = l_SumR / len(a_CircleParametersRaw.m_PointData)
+        a_XYRadialMean = l_SumR / len(a_PointData)
     #--------------------------------------------------------------------------
 
 
@@ -143,7 +141,31 @@ class myCircleParameters:
 
     #--------------------------------------------------------------------------
     def SetXYRootMeanSquareDeviationFromRCNom( self
-                                             , l_CircleParametersRCNom.m_XYRadialDistances):
-        None
+                                             , a_PointData
+                                             , a_PointDataRCNom):
+
+        l_RMSDevFromRCNom = self.SetRootMeanSquaredDeviation( a_PointData
+                                                            , a_PointDataRCNom)
     #--------------------------------------------------------------------------
+
+
+    #--------------------------------------------------------------------------
+    def SetXYRootMeanSquareDeviationFromTrueNom( self
+                                               , a_PointData
+                                               , a_NominalRadius):
+
+        l_SumSquaredDeviations = 0
+        for l_PointIndex in range(0, len(self.m_XYRadialDistancesNomCentre)):
+            l_CurrentDeviation = self.m_XYRadialDistancesNomCentre[l_PointIndex] - a_NominalRadius
+            l_CurrentDeviationSquared = l_CurrentDeviation * l_CurrentDeviation
+            l_SumSquaredDeviations += l_CurrentDeviationSquared
+
+        l_MeanSquaredDeviation = l_SumSquaredDeviations / len(self.m_XYRadialDistancesNomCentre)
+        l_RMS = math.sqrt(l_MeanSquaredDeviation);
+
+        return l_RMS
+    #--------------------------------------------------------------------------
+
+
+
 #==============================================================================
