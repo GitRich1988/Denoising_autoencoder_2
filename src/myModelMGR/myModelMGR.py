@@ -621,7 +621,15 @@ class myModelMGR:
 
             self.SetAndWriteFittedParameters( l_TestingExampleRaw
                                             , l_TestingExampleRCNom
-                                            , l_DenoisedPrediction)
+                                            , l_DenoisedPrediction
+                                            , a_CNNParameters
+                                            , a_ModelBuildingTime
+                                            , a_ModelTrainingTime
+                                            , a_ExampleIndex
+                                            , a_CNNIndex
+                                            , l_DenoisingTimeTaken
+                                            , l_DirCNNIndex
+                                            , l_DateTimeStampCurrentTest)
 
             """
             # Calculate and write results for the current testing example
@@ -1146,37 +1154,36 @@ class myModelMGR:
     def SetAndWriteFittedParameters( self
                                    , a_TestingExampleRaw
                                    , a_TestingExampleRCNom
-                                   , a_DenoisedPrediction):
+                                   , a_DenoisedPrediction
+                                   , a_CNNParameters
+                                   , a_ModelBuildingTime
+                                   , a_ModelTrainingTime
+                                   , a_ExampleIndex
+                                   , a_CNNIndex
+                                   , a_DenoisingTimeTaken
+                                   , a_DirCNNIndex
+                                   , a_DateTimeStampCurrentTest):
 
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
-        #l_CircleParametersRCNom = myCircleParameters.myCircleParameters()
         l_CircleParametersRCNom = myCircleParameters()
-        l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom)
-        l_CircleParametersRCNom.SetXYRadialDistances(0, 0)
-        l_CircleParametersRCNom.SetCircleParameters()
+        l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom, self.m_NominalRadius)
+        l_CircleParametersRCNom.SetAllRMSInfo()
+        l_CircleParametersRCNom.SetCircleFittedParameters()
 
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRaw = myCircleParameters()
-        l_CircleParametersRaw.Initialise(l_TestingExampleRaw)
-        l_CircleParametersRaw.SetRootMeanSquaredDeviation( l_CircleParametersRaw.m_PointData
-                                                         , l_TestingExampleRCNom)
-        l_CircleParametersRaw.SetXYRadialDistances(0, 0)
-        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromTrueNom(l_CircleParametersRaw.m_PointData, self.m_NominalRadius)
-        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
-        l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromRCNom(l_TestingExampleRaw, l_TestingExampleRCNom)
-        l_CircleParametersRaw.SetCircleParameters()
+        l_CircleParametersRaw.Initialise(l_TestingExampleRaw, self.m_NominalRadius)
+        l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
+        l_CircleParametersRaw.SetCircleFittedParameters()
 
         # Denoised
         l_DenoisedPrediction = a_DenoisedPrediction[0]
-        l_CircleParametersDenoised = myCircleParameters.myCircleParameters(l_DenoisedPrediction)
-        l_CircleParametersDenoised.SetRootMeanSquaredDeviation( l_CircleParametersDenoised.m_PointData
-                                                                , l_TestingExampleRCNom)
-        l_CircleParametersDenoised.SetXYRadialDistances(0, 0)
-        l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
-        l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
-        l_CircleParametersDenoised.SetCircleParameters()
+        l_CircleParametersDenoised = myCircleParameters()
+        l_CircleParametersDenoised.Initialise(l_DenoisedPrediction, self.m_NominalRadius)
+        l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
+        l_CircleParametersDenoised.SetCircleFittedParameters()
 
         print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
         print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
@@ -1185,19 +1192,16 @@ class myModelMGR:
         print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_XYRMSDevFromRCNom)
 
         self.WriteResultsForCNNParameters( a_CNNParameters
-                                            , l_CircleParametersRaw
-                                            , l_CircleParametersRCNom
-                                            , l_CircleParametersDenoised
-                                            , 1 #<-- l_TotalTestingExamplesHandled
-                                            , a_ExampleIndex
-                                            , self.m_DateTimeStampOverall
-                                            , l_DateTimeStampCurrentTest
-                                            , a_ModelBuildingTime
-                                            , a_ModelTrainingTime
-                                            , l_DenoisingTimeTaken
-                                            , l_DirCNNIndex)
-
-
-
+                                         , l_CircleParametersRaw
+                                         , l_CircleParametersRCNom
+                                         , l_CircleParametersDenoised
+                                         , 1 #<-- l_TotalTestingExamplesHandled
+                                         , a_ExampleIndex
+                                         , self.m_DateTimeStampOverall
+                                         , a_DateTimeStampCurrentTest
+                                         , a_ModelBuildingTime
+                                         , a_ModelTrainingTime
+                                         , a_DenoisingTimeTaken
+                                         , a_DirCNNIndex)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
