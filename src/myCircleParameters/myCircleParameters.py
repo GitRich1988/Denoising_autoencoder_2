@@ -24,7 +24,14 @@ class myCircleParameters:
         self.m_K = 0
         self.m_Radius = 0
 
+        self.m_NominalCentreX = 0
+        self.m_NominalCentreY = 0
+        self.m_NominalCentreZ = 0
+        self.m_NominalI = 0
+        self.m_NominalJ = 0
+        self.m_NominalK = 0
         self.m_NominalRadius = 0
+
         self.m_XYRadialDistancesNomCentre = []
         self.m_XYRadialMean = 0
         self.m_RMSDevFromXYRadialMean = 0
@@ -56,7 +63,7 @@ class myCircleParameters:
         self.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
         self.SetXYRootMeanSquareDeviationFromTrueNom()
 
-        if(a_TestingExampleRCNom != None):
+        if a_TestingExampleRCNom is not None:
             self.SetRMSDevPointToPoint( a_TestingExampleRCNom
                                       , self.m_RMSDevFromRCNom)
 
@@ -71,10 +78,10 @@ class myCircleParameters:
             l_CurrentX = self.m_PointData[l_PointIndex][0]
             l_CurrentY = self.m_PointData[l_PointIndex][1]
 
-            l_DiffX = l_CurrentX - self.m_NomCentreX
-            l_DiffY = l_CurrentY - self.m_NomCentreY
-            l_DiffXSquared = l_DiffX^2
-            l_DiffYSquared = l_DiffY^2
+            l_DiffX = l_CurrentX - self.m_NominalCentreX
+            l_DiffY = l_CurrentY - self.m_NominalCentreY
+            l_DiffXSquared = l_DiffX*l_DiffX
+            l_DiffYSquared = l_DiffY*l_DiffY
             l_RadialDistanceSquared = l_DiffXSquared + l_DiffYSquared
             l_RadialDistance = math.sqrt(l_RadialDistanceSquared)
 
@@ -145,8 +152,6 @@ class myCircleParameters:
         l_MeanRadialDifferenceSquared = l_SumRSquared / len(self.m_PointData)
         a_RMS = math.sqrt(l_MeanRadialDifferenceSquared)
     #--------------------------------------------------------------------------
-
-
 
 
     #--------------------------------------------------------------------------

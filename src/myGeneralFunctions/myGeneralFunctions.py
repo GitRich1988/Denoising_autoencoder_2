@@ -70,14 +70,19 @@ class myGeneralFunctions:
 
 
     #--------------------------------------------------------------------------
+    def CheckDirExists(a_FolderPath):
+        #return os.path.isdir(os.path.normpath(a_FolderPath))
+        return os.path.isdir(a_FolderPath)
+    #--------------------------------------------------------------------------
+
+
+    #--------------------------------------------------------------------------
     def GetDirsInDir(a_DirPath):
         if not os.path.isdir(a_DirPath):
                 raise ValueError(f"The path '{a_DirPath}' is not a valid directory.")
 
         return [name for name in os.listdir(a_DirPath)
                 if os.path.isdir(os.path.join(a_DirPath, name))]
-
-
     #--------------------------------------------------------------------------
 
 

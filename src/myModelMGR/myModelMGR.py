@@ -629,7 +629,8 @@ class myModelMGR:
                                             , a_CNNIndex
                                             , l_DenoisingTimeTaken
                                             , l_DirCNNIndex
-                                            , l_DateTimeStampCurrentTest)
+                                            , l_DateTimeStampCurrentTest
+                                            , self.m_DataSetMGR.m_DateTimeStampOverall)
 
             """
             # Calculate and write results for the current testing example
@@ -814,8 +815,9 @@ class myModelMGR:
                                     , a_ModelTestingTime
                                     , a_DirCNNIndex):
 
-        l_ProjectInfo = myProjectInfo.myProjectInfo()
-        l_DirModelRecords = l_ProjectInfo.m_ModelRecordsDir
+        l_ProjectInfo = myProjectInfo()
+        #l_DirModelRecords = l_ProjectInfo.m_ModelRecordsDir
+        l_DirModelRecords = l_ProjectInfo.GetDirModelRecords()
         l_DirDenoisingEncoder = l_DirModelRecords + "Denoising_autoencoder/"
         l_GeneralFunctions.MakeDirIfNonExistent(l_DirDenoisingEncoder)
 
@@ -1112,7 +1114,7 @@ class myModelMGR:
             l_NewLineDataFrame.columns = l_ColumnTitles
             #print("l_NewLineDataFrame.shape  ", l_NewLineDataFrame.shape)
 
-            l_ProjectInfo = myProjectInfo.myProjectInfo()
+            l_ProjectInfo = myProjectInfo()
             l_DirModelRecords = l_ProjectInfo.m_ModelRecordsDir
             l_DirDenoisingEncoder = l_DirModelRecords + "Denoising_autoencoder/"
             l_GeneralFunctions.MakeDirIfNonExistent(l_DirDenoisingEncoder)
@@ -1162,7 +1164,8 @@ class myModelMGR:
                                    , a_CNNIndex
                                    , a_DenoisingTimeTaken
                                    , a_DirCNNIndex
-                                   , a_DateTimeStampCurrentTest):
+                                   , a_DateTimeStampCurrentTest
+                                   , a_DateTimeStampOverall):
 
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
@@ -1188,8 +1191,8 @@ class myModelMGR:
         print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
         print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
         print("l_CircleParametersDenoised.m_Radius:           ", l_CircleParametersDenoised.m_Radius)
-        print("l_CircleParametersRaw.m_XYRMSDevFromRCNom:     ", l_CircleParametersRaw.m_XYRMSDevFromRCNom)
-        print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_XYRMSDevFromRCNom)
+        print("l_CircleParametersRaw.m_XYRMSDevFromRCNom:     ", l_CircleParametersRaw.m_RMSDevFromRCNom)
+        print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_RMSDevFromRCNom)
 
         self.WriteResultsForCNNParameters( a_CNNParameters
                                          , l_CircleParametersRaw
@@ -1197,7 +1200,7 @@ class myModelMGR:
                                          , l_CircleParametersDenoised
                                          , 1 #<-- l_TotalTestingExamplesHandled
                                          , a_ExampleIndex
-                                         , self.m_DateTimeStampOverall
+                                         , a_DateTimeStampOverall
                                          , a_DateTimeStampCurrentTest
                                          , a_ModelBuildingTime
                                          , a_ModelTrainingTime
