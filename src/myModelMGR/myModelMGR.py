@@ -129,11 +129,12 @@ class myModelMGR:
                 # Test the model on a single example
                 l_ExampleIndex = 0
                 self.TestOneCNNOnSingleExample_GPUVersion( l_AutoEncoder
-                                                         , l_CurrentHyperParameterSet
+                                                         , l_CurrentCNNDefinition
                                                          , l_ModelBuildingTime
                                                          , l_ModelTrainingTime
                                                          , l_ExampleIndex
-                                                         , l_CNNIndex)
+                                                         , l_CNNIndex
+                                                         , l_CurrentHyperParameterSet)
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
     #--------------------------------------------------------------------------
@@ -508,7 +509,8 @@ class myModelMGR:
                                             , a_ModelBuildingTime
                                             , a_ModelTrainingTime
                                             , a_ExampleIndex
-                                            , a_CNNIndex):
+                                            , a_CNNIndex
+                                            , a_CurrentHyperParameterSet):
         l_GeneralFunctions.PrintMethodSTART("TestOneCNNOnSingleExample_GPUVersion()", "=", 1, 0)
 
         with tf.device('/GPU:0'):
@@ -630,7 +632,8 @@ class myModelMGR:
                                             , l_DenoisingTimeTaken
                                             , l_DirCNNIndex
                                             , l_DateTimeStampCurrentTest
-                                            , self.m_DataSetMGR.m_DateTimeStampOverall)
+                                            , self.m_DataSetMGR.m_DateTimeStampOverall
+                                            , a_CurrentHyperParameterSet)
 
             """
             # Calculate and write results for the current testing example
@@ -813,7 +816,8 @@ class myModelMGR:
                                     , a_ModelBuildingTime
                                     , a_ModelTrainingTime
                                     , a_ModelTestingTime
-                                    , a_DirCNNIndex):
+                                    , a_DirCNNIndex
+                                    , a_CurrentHyperParameterSet):
 
         l_ProjectInfo = myProjectInfo()
         #l_DirModelRecords = l_ProjectInfo.m_ModelRecordsDir
@@ -821,29 +825,53 @@ class myModelMGR:
         l_DirDenoisingEncoder = l_DirModelRecords + "Denoising_autoencoder/"
         l_GeneralFunctions.MakeDirIfNonExistent(l_DirDenoisingEncoder)
 
+        print("type(): ", type(a_CurrentHyperParameterSet))
+
+        #l_HyperParameters = json.loads(a_CurrentHyperParameterSet)
+        l_HyperParameters = a_CurrentHyperParameterSet
+
         if(l_GeneralFunctions.CheckDirExists(l_DirDenoisingEncoder)):
 
             l_Data = [
                 a_DateTimeStampOverall,
                 a_DateTimeStampCurrentCNN,
-                self.m_HyperParameters.m_NumEpochs,
-                self.m_HyperParameters.m_BatchSize,
-                self.m_HyperParameters.m_ActivationFunction,
-                self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction),
-                self.m_HyperParameters.m_Optimizer,
+                a_CurrentHyperParameterSet[0]['NumEpochs'],
+                a_CurrentHyperParameterSet[0]['TrainingBatchSize'],
+                a_CurrentHyperParameterSet[0]['ActivationFunction'],
+                #self.GetTableFriendlyLossFunction(a_CurrentHyperParameterSet[0]['LossFunction']),
+                a_CurrentHyperParameterSet[0]['LossFunction'],
+                a_CurrentHyperParameterSet[0]['Optimizer'],
                 round(a_CircleParametersRaw.m_Radius, 4),
                 round(a_CircleParametersRCNominal.m_Radius, 4),
                 round(a_CircleParametersDenoised.m_Radius, 4),
                 round(a_CircleParametersRaw.m_Circularity, 4),
                 round(a_CircleParametersDenoised.m_Circularity, 4),
-                round(a_CircleParametersRaw.m_MeanSquareDeviation, 4),
-                round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4),
-                round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8),
-                round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8),
-                round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8),
-                round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8),
-                round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8),
-                round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8),
+
+                round(a_CircleParametersRaw.m_RMSDevFromTrueNom, 4),
+                round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4),
+
+                #round(a_CircleParametersRaw.m_MeanSquareDeviation, 4),
+                #round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4),
+                round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 4),
+                round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 4),
+
+                #round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8),
+                round(a_CircleParametersRaw.m_XYRadialMean, 8),
+
+                #round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8),
+                round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8),
+
+                #round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8),
+                round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8),
+
+                #round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8),
+                round(a_CircleParametersDenoised.m_XYRadialMean, 8),
+                
+                #round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8),
+                #round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8),
+                round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8),
+                round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8),
+
                 round(a_CircleParametersRaw.m_CentreX, 4),
                 round(a_CircleParametersRaw.m_CentreY, 4),
                 round(a_CircleParametersRaw.m_CentreZ, 4),
@@ -853,8 +881,8 @@ class myModelMGR:
                 round(a_ModelBuildingTime, 6),
                 round(a_ModelTrainingTime, 6),
                 round(a_ModelTestingTime, 6),
-                a_CurrentCNNParameters.m_NumFiltersList,
-                a_CurrentCNNParameters.m_KernelSizeList
+                a_CurrentCNNParameters[0]['NumFiltersList'],
+                a_CurrentCNNParameters[0]['KernelSizesList']
             ]
 
             l_ColumnWidths = [21, 21, 5, 5, 10, 20,
@@ -1165,7 +1193,8 @@ class myModelMGR:
                                    , a_DenoisingTimeTaken
                                    , a_DirCNNIndex
                                    , a_DateTimeStampCurrentTest
-                                   , a_DateTimeStampOverall):
+                                   , a_DateTimeStampOverall
+                                   , a_CurrentHyperParameterSet):
 
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
@@ -1173,6 +1202,7 @@ class myModelMGR:
         l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom, self.m_NominalRadius)
         l_CircleParametersRCNom.SetAllRMSInfo()
         l_CircleParametersRCNom.SetCircleFittedParameters()
+        l_CircleParametersRCNom.SetCircularity()
 
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
@@ -1180,6 +1210,7 @@ class myModelMGR:
         l_CircleParametersRaw.Initialise(l_TestingExampleRaw, self.m_NominalRadius)
         l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircleFittedParameters()
+        l_CircleParametersRaw.SetCircularity()
 
         # Denoised
         l_DenoisedPrediction = a_DenoisedPrediction[0]
@@ -1187,6 +1218,7 @@ class myModelMGR:
         l_CircleParametersDenoised.Initialise(l_DenoisedPrediction, self.m_NominalRadius)
         l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersDenoised.SetCircleFittedParameters()
+        l_CircleParametersDenoised.SetCircularity()
 
         print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
         print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
@@ -1205,6 +1237,7 @@ class myModelMGR:
                                          , a_ModelBuildingTime
                                          , a_ModelTrainingTime
                                          , a_DenoisingTimeTaken
-                                         , a_DirCNNIndex)
+                                         , a_DirCNNIndex
+                                         , a_CurrentHyperParameterSet)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================

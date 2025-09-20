@@ -37,6 +37,7 @@ class myCircleParameters:
         self.m_RMSDevFromXYRadialMean = 0
         self.m_RMSDevFromTrueNom = 0
         self.m_RMSDevFromRCNom = 0
+        self.m_Circularity = 0
 
         l_GeneralFunctions.PrintMethodEND("myCircleParameters.__init__()", "=", 0, 0)
     #--------------------------------------------------------------------------
@@ -128,7 +129,6 @@ class myCircleParameters:
     #--------------------------------------------------------------------------
 
     
-
     #--------------------------------------------------------------------------
     def SetRMSDevPointToPoint( self
                              , a_PointDataForComparison
@@ -151,6 +151,31 @@ class myCircleParameters:
 
         l_MeanRadialDifferenceSquared = l_SumRSquared / len(self.m_PointData)
         a_RMS = math.sqrt(l_MeanRadialDifferenceSquared)
+    #--------------------------------------------------------------------------
+
+    
+    #--------------------------------------------------------------------------
+    def SetCircularity(self):
+        l_MaxNegativeDeviation = 0
+        l_MaxPositiveDeviation = 0
+
+        for l_PointIndex in range(0, len(self.m_XYRadialDistancesNomCentre)):
+            l_CurrentXYRadialDistance = self.m_XYRadialDistancesNomCentre[l_PointIndex]
+            l_Diff = l_CurrentXYRadialDistance - self.m_Radius
+            
+            if(l_Diff > 0):
+                if(l_Diff > l_MaxPositiveDeviation):
+                    l_MaxPositiveDeviation = l_Diff
+
+            elif(l_Diff < 0):
+                if(l_Diff < l_MaxNegativeDeviation):
+                    l_MaxNegativeDeviation = l_Diff
+
+        self.m_Circularity = l_MaxPositiveDeviation
+        
+        l_MaxNegativeDeviation = -1 * l_MaxNegativeDeviation
+        if(l_MaxNegativeDeviation > l_MaxPositiveDeviation):
+            self.m_Circularity = l_MaxNegativeDeviation
     #--------------------------------------------------------------------------
 
 
