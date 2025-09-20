@@ -70,6 +70,12 @@ class myGeneralFunctions:
 
 
     #--------------------------------------------------------------------------
+    def CheckFileExists(a_FilePath):
+        return os.path.exists(a_FilePath)
+    #--------------------------------------------------------------------------
+
+
+    #--------------------------------------------------------------------------
     def CheckDirExists(a_FolderPath):
         #return os.path.isdir(os.path.normpath(a_FolderPath))
         return os.path.isdir(a_FolderPath)
