@@ -1,6 +1,5 @@
 # src/myDataSetMGR/myModelMGR.py
 
-#from typing import Self
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
@@ -22,7 +21,7 @@ import ast
 #==============================================================================
 class myModelMGR:
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def __init__(self, a_DataSetMGR):
         l_GeneralFunctions.PrintMethodSTART("myModelMGR.__init__()", "=", 1, 0)
 
@@ -40,17 +39,17 @@ class myModelMGR:
         self.Initialise()
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.__init__()", "=", 0, 0)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def Initialise(self):
         self.SetListOfHyperParameterSets()
         self.SetListOfCNNDefinitions()
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfHyperParameterSets(self):
 
         l_FullPathHyperParametersFile = self.m_DirHyperParameterSets + "Hyper_parameters_1.json"
@@ -58,10 +57,10 @@ class myModelMGR:
         with open(l_FullPathHyperParametersFile, 'r') as f:
             l_JSONData = json.load(f)
             self.m_ListOfHyperParameterSets.append(l_JSONData)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfCNNDefinitions(self):
 
         l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + "CNN_definition_1.json"
@@ -69,10 +68,10 @@ class myModelMGR:
         with open(l_FullPathCNNDefinitionsFile, 'r') as f:
             l_JSONData = json.load(f)
             self.m_ListOfCNNDefinitions.append(l_JSONData)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def Run(self):
         l_GeneralFunctions.PrintMethodSTART("myModelMGR.Run()", "=", 0, 0)
 
@@ -122,11 +121,13 @@ class myModelMGR:
                 l_AutoEncoder = l_TrainingCNNList[0]
                 l_ModelTrainingTime = l_TrainingCNNList[1]
 
+
                 # Save CNN weights to file
                 ##self.DisplayCNNWeightsFromFile(l_FullPathCNNWeightsEarlierRun)
                 ##self.SaveCNNWeights(l_AutoEncoder, a_CNNParameters)
                 self.SaveFirstFewCNNWeights( l_AutoEncoder
                                            , l_CurrentCNNDefinition)
+
 
                 # Test the model on a single example
                 l_ExampleIndex = 0
@@ -139,10 +140,10 @@ class myModelMGR:
                                                          , l_CurrentHyperParameterSet)
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def DefineAndBuildOneCNN( self
                             , a_CNNDefinition
                             , a_HyperParameterSet):
@@ -204,10 +205,10 @@ class myModelMGR:
             return [l_AutoEncoder, l_ModelBuildingTime]
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.BuildOneCNN()", "=", 0, 0)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def ConstructCNNArchitecture( self
                                 , a_NumFiltersList
                                 , a_KernelSizesList):
@@ -258,7 +259,8 @@ class myModelMGR:
         return l_Model
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.ConstructCNNArchitecture()", "=", 0, 0)
-    #--------------------------------------------------------------------------
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # Surviving from original program:
