@@ -1,5 +1,6 @@
 # src/myDataSetMGR/myModelMGR.py
 
+#from typing import Self
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
@@ -772,15 +773,9 @@ class myModelMGR:
                                     , a_CurrentHyperParameterSet):
 
         l_ProjectInfo = myProjectInfo()
-        #l_DirModelRecords = l_ProjectInfo.m_ModelRecordsDir
         l_DirModelRecords = l_ProjectInfo.GetDirModelRecords()
         l_DirDenoisingEncoder = l_DirModelRecords + "Denoising_autoencoder/"
         l_GeneralFunctions.MakeDirIfNonExistent(l_DirDenoisingEncoder)
-
-        print("type(): ", type(a_CurrentHyperParameterSet))
-
-        #l_HyperParameters = json.loads(a_CurrentHyperParameterSet)
-        l_HyperParameters = a_CurrentHyperParameterSet
 
         if(l_GeneralFunctions.CheckDirExists(l_DirDenoisingEncoder)):
 
@@ -879,35 +874,14 @@ class myModelMGR:
             l_NewLineDataFrame = pd.DataFrame( [l_Data]
                                              , l_Columns)
 
-            l_FileNameAllRecords = "All_records.txt"
-            l_FullPathAllRecords = l_DirDenoisingEncoder + l_FileNameAllRecords
-            l_FileExistsAllRecords = l_GeneralFunctions.CheckFileExists(l_FullPathAllRecords)
+            self.UpdateAllRecordsFile( l_DirDenoisingEncoder
+                                     , l_NewLineDataFrame
+                                     , l_ColumnWidths)
 
-            if l_FileExistsAllRecords:
-                l_GeneralFunctions.WritePandasDataFrameToFile( l_NewLineDataFrame
-                                                             , l_FullPathAllRecords
-                                                             , l_ColumnWidths
-                                                             , 'a')
-            else:
-                l_GeneralFunctions.WritePandasDataFrameToFile( l_NewLineDataFrame
-                                                             , l_FullPathAllRecords
-                                                             , l_ColumnWidths
-                                                             , 'w')
-
-            l_FileNameCurrentRecords = "Testing_" + a_DateTimeStampOverall + ".txt"
-            l_FullPathCurrentRecords = l_DirDenoisingEncoder + l_FileNameCurrentRecords
-            l_FileExistsCurrentRecords = l_GeneralFunctions.CheckFileExists(l_FullPathCurrentRecords)
-
-            if l_FileExistsCurrentRecords:
-                l_GeneralFunctions.WritePandasDataFrameToFile( l_NewLineDataFrame
-                                                       , l_FullPathCurrentRecords
-                                                       , l_ColumnWidths
-                                                       , 'a')
-            else:
-                l_GeneralFunctions.WritePandasDataFrameToFile( l_NewLineDataFrame
-                                                             , l_FullPathCurrentRecords
-                                                             , l_ColumnWidths
-                                                             , 'w')
+            self.WriteCurrentRecordsFile( l_DirDenoisingEncoder
+                                        , l_NewLineDataFrame
+                                        , l_ColumnWidths
+                                        , a_DateTimeStampOverall)
 
             self.WriteIndividualQuantityTablesToFile( a_CurrentCNNParameters
                                                     , a_CircleParametersRaw
@@ -927,50 +901,67 @@ class myModelMGR:
             #FINALISE THESE TOMORROW (27/07/2025):
 
             l_JSON = {}
-            l_JSON['DateTimeOverall'] = a_DateTimeStampOverall
-            l_JSON['DateTimeCurrent'] = a_DateTimeStampCurrentCNN
-            l_JSON['Num_Epochs'] = a_CurrentHyperParameterSet[0]['NumEpochs']
-            l_JSON['Batch_Size'] = a_CurrentHyperParameterSet[0]['TrainingBatchSize']
-            l_JSON['Activation'] = a_CurrentHyperParameterSet[0]['ActivationFunction']
-            #l_JSON['Loss'] = self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction)
-            l_JSON['Loss'] = a_CurrentHyperParameterSet[0]['LossFunction']
-            l_JSON['Optimizer'] = a_CurrentHyperParameterSet[0]['Optimizer']
-            l_JSON['Radius_Raw'] = round(a_CircleParametersRaw.m_Radius, 4)
-            l_JSON['Radius_RCNom'] = round(a_CircleParametersRCNominal.m_Radius, 4)
-            l_JSON['Radius_Denoised'] = round(a_CircleParametersDenoised.m_Radius, 4)
-            l_JSON['Circularity_Raw'] = round(a_CircleParametersRaw.m_Circularity, 4)
-            l_JSON['Circularity_Denoised'] = round(a_CircleParametersDenoised.m_Circularity, 4)
-            #l_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_MeanSquareDeviation, 4)
-            l_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromTrueNom , 4)
-            #l_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4)
-            l_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4)
-            #l_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8)
-            l_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_XYRadialMean, 8)
-            #l_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8)
-            l_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
-            #l_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8)
-            l_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
-            #l_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8)
-            l_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
-            #l_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8)
-            l_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
-            #l_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8)
-            l_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
-            l_JSON['CentreX_Raw'] = round(a_CircleParametersRaw.m_CentreX, 4)
-            l_JSON['CentreY_Raw'] = round(a_CircleParametersRaw.m_CentreY, 4)
-            l_JSON['CentreZ_Raw'] = round(a_CircleParametersRaw.m_CentreZ, 4)
-            l_JSON['CentreX_Denoised'] = round(a_CircleParametersDenoised.m_CentreX, 4)
-            l_JSON['CentreY_Denoised'] = round(a_CircleParametersDenoised.m_CentreY, 4)
-            l_JSON['Centrez_Denoised'] = round(a_CircleParametersDenoised.m_CentreZ, 4)
-            l_JSON['Build_Time'] = round(a_ModelBuildingTime, 6)
-            l_JSON['Train_Time'] = round(a_ModelTrainingTime, 6)
-            l_JSON['Test_Time'] = round(a_ModelTestingTime, 6)
-            #l_JSON['Num_Filters'] = a_CurrentCNNParameters.m_NumFiltersList
-            l_JSON['Num_Filters'] = a_CurrentCNNParameters[0]['NumFiltersList']
-            #l_JSON['Kernel_Sizes'] = a_CurrentCNNParameters.m_KernelSizeList
-            l_JSON['Kernel_Sizes'] = a_CurrentCNNParameters[0]['KernelSizesList']
+            self.SetJSONOutputSingleExample( l_JSON                              
+                                           , a_DateTimeStampOverall
+                                           , a_DateTimeStampCurrentCNN
+                                           , a_CurrentHyperParameterSet
+                                           , a_CurrentCNNParameters
+                                           , a_CircleParametersRaw
+                                           , a_CircleParametersRCNominal
+                                           , a_CircleParametersDenoised
+                                           , a_ModelBuildingTime
+                                           , a_ModelTrainingTime
+                                           , a_ModelTestingTime)
 
             self.WriteJSONDataForDenoisedExample(l_JSON, a_DirCNNIndex)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def UpdateAllRecordsFile( self
+                            , a_DirDenoisingEncoder
+                            , a_NewLineDataFrame
+                            , a_ColumnWidths):
+
+        l_FileNameAllRecords = "All_records.txt"
+        l_FullPathAllRecords = a_DirDenoisingEncoder + l_FileNameAllRecords
+        l_FileExistsAllRecords = l_GeneralFunctions.CheckFileExists(l_FullPathAllRecords)
+
+        if l_FileExistsAllRecords:
+            l_GeneralFunctions.WritePandasDataFrameToFile( a_NewLineDataFrame
+                                                         , l_FullPathAllRecords
+                                                         , a_ColumnWidths
+                                                         , 'a')
+        else:
+            l_GeneralFunctions.WritePandasDataFrameToFile( a_NewLineDataFrame
+                                                         , l_FullPathAllRecords
+                                                         , a_ColumnWidths
+                                                         , 'w')
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def WriteCurrentRecordsFile( self
+                               , a_DirDenoisingEncoder
+                               , a_NewLineDataFrame
+                               , a_ColumnWidths
+                               , a_DateTimeStampOverall):
+
+        l_FileNameCurrentRecords = "Testing_" + a_DateTimeStampOverall + ".txt"
+        l_FullPathCurrentRecords = a_DirDenoisingEncoder + l_FileNameCurrentRecords
+        l_FileExistsCurrentRecords = l_GeneralFunctions.CheckFileExists(l_FullPathCurrentRecords)
+
+        if l_FileExistsCurrentRecords:
+            l_GeneralFunctions.WritePandasDataFrameToFile( a_NewLineDataFrame
+                                                         , l_FullPathCurrentRecords
+                                                         , a_ColumnWidths
+                                                         , 'a')
+        else:
+            l_GeneralFunctions.WritePandasDataFrameToFile( a_NewLineDataFrame
+                                                         , l_FullPathCurrentRecords
+                                                         , a_ColumnWidths
+                                                         , 'w')
+
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -1175,7 +1166,7 @@ class myModelMGR:
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRCNom = myCircleParameters()
         l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom, self.m_NominalRadius)
-        l_CircleParametersRCNom.SetAllRMSInfo()
+        l_CircleParametersRCNom.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetCircleFittedParameters()
         l_CircleParametersRCNom.SetCircularity()
 
@@ -1214,5 +1205,64 @@ class myModelMGR:
                                          , a_DenoisingTimeTaken
                                          , a_DirCNNIndex
                                          , a_CurrentHyperParameterSet)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def SetJSONOutputSingleExample( self
+                                  , a_JSON
+                                  , a_DateTimeStampOverall
+                                  , a_DateTimeStampCurrentCNN
+                                  , a_CurrentHyperParameterSet
+                                  , a_CurrentCNNParameters
+                                  , a_CircleParametersRaw
+                                  , a_CircleParametersRCNominal
+                                  , a_CircleParametersDenoised
+                                  , a_ModelBuildingTime
+                                  , a_ModelTrainingTime
+                                  , a_ModelTestingTime):
+
+        a_JSON['DateTimeOverall'] = a_DateTimeStampOverall
+        a_JSON['DateTimeCurrent'] = a_DateTimeStampCurrentCNN
+        a_JSON['Num_Epochs'] = a_CurrentHyperParameterSet[0]['NumEpochs']
+        a_JSON['Batch_Size'] = a_CurrentHyperParameterSet[0]['TrainingBatchSize']
+        a_JSON['Activation'] = a_CurrentHyperParameterSet[0]['ActivationFunction']
+        #a_JSON['Loss'] = self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction)
+        a_JSON['Loss'] = a_CurrentHyperParameterSet[0]['LossFunction']
+        a_JSON['Optimizer'] = a_CurrentHyperParameterSet[0]['Optimizer']
+        a_JSON['Radius_Raw'] = round(a_CircleParametersRaw.m_Radius, 4)
+        a_JSON['Radius_RCNom'] = round(a_CircleParametersRCNominal.m_Radius, 4)
+        a_JSON['Radius_Denoised'] = round(a_CircleParametersDenoised.m_Radius, 4)
+        a_JSON['Circularity_Raw'] = round(a_CircleParametersRaw.m_Circularity, 4)
+        a_JSON['Circularity_Denoised'] = round(a_CircleParametersDenoised.m_Circularity, 4)
+        #a_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_MeanSquareDeviation, 4)
+        a_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromTrueNom , 4)
+        #a_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4)
+        a_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4)
+        #a_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8)
+        a_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_XYRadialMean, 8)
+        #a_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8)
+        a_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
+        #a_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8)
+        a_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
+        #a_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8)
+        a_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
+        #a_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8)
+        a_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
+        #a_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8)
+        a_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
+        a_JSON['CentreX_Raw'] = round(a_CircleParametersRaw.m_CentreX, 4)
+        a_JSON['CentreY_Raw'] = round(a_CircleParametersRaw.m_CentreY, 4)
+        a_JSON['CentreZ_Raw'] = round(a_CircleParametersRaw.m_CentreZ, 4)
+        a_JSON['CentreX_Denoised'] = round(a_CircleParametersDenoised.m_CentreX, 4)
+        a_JSON['CentreY_Denoised'] = round(a_CircleParametersDenoised.m_CentreY, 4)
+        a_JSON['Centrez_Denoised'] = round(a_CircleParametersDenoised.m_CentreZ, 4)
+        a_JSON['Build_Time'] = round(a_ModelBuildingTime, 6)
+        a_JSON['Train_Time'] = round(a_ModelTrainingTime, 6)
+        a_JSON['Test_Time'] = round(a_ModelTestingTime, 6)
+        #a_JSON['Num_Filters'] = a_CurrentCNNParameters.m_NumFiltersList
+        a_JSON['Num_Filters'] = a_CurrentCNNParameters[0]['NumFiltersList']
+        #a_JSON['Kernel_Sizes'] = a_CurrentCNNParameters.m_KernelSizeList
+        a_JSON['Kernel_Sizes'] = a_CurrentCNNParameters[0]['KernelSizesList']
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
