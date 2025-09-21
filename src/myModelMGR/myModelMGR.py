@@ -1,4 +1,5 @@
-# src/myDataSetMGR/myDataSetMGR.py
+# src/myDataSetMGR/myModelMGR.py
+
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
@@ -634,55 +635,6 @@ class myModelMGR:
                                             , l_DateTimeStampCurrentTest
                                             , self.m_DataSetMGR.m_DateTimeStampOverall
                                             , a_CurrentHyperParameterSet)
-
-            """
-            # Calculate and write results for the current testing example
-            # RCNom
-            l_TestingExampleRCNom = l_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
-            l_CircleParametersRCNom = myCircleParameters.myCircleParameters()
-            l_CircleParametersRCNom.SetPointData(l_TestingExampleRCNom)
-            l_CircleParametersRCNom.SetXYRadialDistances(0, 0)
-            l_CircleParametersRCNom.SetCircleParameters()
-            # Raw
-            l_TestingExampleRaw = l_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
-            l_CircleParametersRaw = myCircleParameters.myCircleParameters()
-            l_CircleParametersRaw.SetPointData(l_TestingExampleRaw)
-            l_CircleParametersRaw.SetRootMeanSquaredDeviation( l_CircleParametersRaw.m_PointData
-                                                             , l_TestingExampleRCNom)
-            l_CircleParametersRaw.SetXYRadialDistances(0, 0)
-            l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
-            l_CircleParametersRaw.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
-            l_CircleParametersRaw.SetCircleParameters()
-            # Denoised
-            l_CircleParametersDenoised = myCircleParameters.myCircleParameters()
-            l_CircleParametersDenoised.SetPointData(l_DenoisedPrediction[0])
-            l_CircleParametersDenoised.SetRootMeanSquaredDeviation( l_CircleParametersDenoised.m_PointData
-                                                                  , l_TestingExampleRCNom)
-            l_CircleParametersDenoised.SetXYRadialDistances(0, 0)
-            l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
-            l_CircleParametersDenoised.SetXYRootMeanSquareDeviationFromRCNom(l_CircleParametersRCNom.m_XYRadialDistances)
-            l_CircleParametersDenoised.SetCircleParameters()
-
-
-            print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
-            print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
-            print("l_CircleParametersDenoised.m_Radius:           ", l_CircleParametersDenoised.m_Radius)
-            print("l_CircleParametersRaw.m_XYRMSDevFromRCNom:     ", l_CircleParametersRaw.m_XYRMSDevFromRCNom)
-            print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_XYRMSDevFromRCNom)
-
-            self.WriteResultsForCNNParameters( a_CNNParameters
-                                             , l_CircleParametersRaw
-                                             , l_CircleParametersRCNom
-                                             , l_CircleParametersDenoised
-                                             , 1 #<-- l_TotalTestingExamplesHandled
-                                             , a_ExampleIndex
-                                             , self.m_DateTimeStampOverall
-                                             , l_DateTimeStampCurrentTest
-                                             , a_ModelBuildingTime
-                                             , a_ModelTrainingTime
-                                             , l_DenoisingTimeTaken
-                                             , l_DirCNNIndex)
-            """
 
         l_GeneralFunctions.PrintMethodEND("TestOneCNNOnSingleExample_GPUVersion()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

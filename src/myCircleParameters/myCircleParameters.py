@@ -1,10 +1,12 @@
-# src/myDataSetMGR/myDataSetMGR.py
+# src/myDataSetMGR/myCircleParameters.py
 
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 import math
 import pandas as pd
 import re
 import random
+import numpy as np
+from scipy.optimize import least_squares
 
 
 #==============================================================================
@@ -153,6 +155,53 @@ class myCircleParameters:
         a_RMS = math.sqrt(l_MeanRadialDifferenceSquared)
     #--------------------------------------------------------------------------
 
+
+    #--------------------------------------------------------------------------
+    def SetCircleFittedParameters(self):
+        #l_GeneralFunctions.PrintMethodSTART("myCircleParameters.SetCircleParameters()", "=", 1, 0)
+
+        l_Results = self.FitCircle2D()
+        self.m_Radius = l_Results[1]
+        self.m_CentreX = l_Results[0][0]
+        self.m_CentreY = l_Results[0][1]
+        self.m_CentreZ = 0
+        self.m_I = 0
+        self.m_J = 0
+        self.m_K = 1
+
+        #l_GeneralFunctions.PrintMethodEND("myCircleParameters.SetCircleParameters()", "=", 0, 0)
+    #--------------------------------------------------------------------------
+
+    #--------------------------------------------------------------------------
+    def FitCircle2D(self):
+        """
+        Fit a circle to 2D points using least squares.
+    
+        Parameters:
+            points (array-like): List or array of (x, y) tuples or shape (N, 2).
+    
+        Returns:
+            center (tuple): (x, y) coordinates of the circle center.
+            radius (float): Radius of the fitted circle.
+        """
+        points = np.asarray(self.m_PointData[:,0:2])
+        print("points.shape:", points.shape)
+    
+        # Initial guess: center at mean of points, radius as mean distance to center
+        x_m, y_m = np.mean(points, axis=0)
+        r_guess = np.mean(np.sqrt((points[:,0] - x_m)**2 + (points[:,1] - y_m)**2))
+        initial_guess = [x_m, y_m, r_guess]
+
+        def residuals(params):
+            x0, y0, r = params
+            return np.sqrt((points[:,0] - x0)**2 + (points[:,1] - y0)**2) - r
+
+        result = least_squares(residuals, initial_guess)
+
+        x0, y0, r = result.x
+        return (x0, y0), r
+    #--------------------------------------------------------------------------
+
     
     #--------------------------------------------------------------------------
     def SetCircularity(self):
@@ -177,14 +226,4 @@ class myCircleParameters:
         if(l_MaxNegativeDeviation > l_MaxPositiveDeviation):
             self.m_Circularity = l_MaxNegativeDeviation
     #--------------------------------------------------------------------------
-
-
-    #--------------------------------------------------------------------------
-    def SetCircleFittedParameters(self):
-        l_GeneralFunctions.PrintMethodSTART("myCircleParameters.SetCircleParameters()", "=", 1, 0)
-
-
-        l_GeneralFunctions.PrintMethodEND("myCircleParameters.SetCircleParameters()", "=", 0, 0)
-    #--------------------------------------------------------------------------
-
 #==============================================================================
