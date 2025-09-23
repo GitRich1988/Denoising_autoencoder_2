@@ -126,11 +126,7 @@ class myModelMGR:
                                  , a_HyperParameterSet
                                  , a_ModelAndTimes):
         # Reset random seeds
-        tf.keras.backend.clear_session()
-        np.random.seed(self.m_RandomSeedNumpy)
-        random.seed(self.m_RandomSeedRandom)
-        tf.random.set_seed(self.m_RandomSeedTensorflow)
-
+        self.ResetRandomSeeds()
 
         # Build the model
         l_AutoEncoder = None
@@ -138,20 +134,19 @@ class myModelMGR:
         [l_AutoEncoder, l_ModelBuildingTime] = self.DefineAndBuildOneCNN( a_CNNDefinition
                                                                         , a_HyperParameterSet)
 
-
         # Train the model
         l_ModelTrainingTime = 0;
         l_History = None
         l_FullPathCNNWeights = None
-        l_TrainingCNNList = [ l_AutoEncoder
+        l_TrainOneCNNList = [ l_AutoEncoder
                             , l_ModelTrainingTime
                             , l_History
-                            , l_FullPathCNNWeights]
-        l_TrainingCNNList = self.TrainOneCNN( l_TrainingCNNList
+                            , l_FullPathCNNWeights ]
+        l_TrainOneCNNList = self.TrainOneCNN( l_TrainOneCNNList
                                             , a_HyperParameterSet
                                             , l_ModelBuildingTime)
-        l_AutoEncoder = l_TrainingCNNList[0]
-        l_ModelTrainingTime = l_TrainingCNNList[1]
+        l_AutoEncoder = l_TrainOneCNNList[0]
+        l_ModelTrainingTime = l_TrainOneCNNList[1]
 
         a_ModelAndTimes[0] = l_AutoEncoder
         a_ModelAndTimes[1] = l_ModelBuildingTime
@@ -164,11 +159,21 @@ class myModelMGR:
                                    , a_CNNDefinition)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def ResetRandomSeeds(self):
+        tf.keras.backend.clear_session()
+        np.random.seed(self.m_RandomSeedNumpy)
+        random.seed(self.m_RandomSeedRandom)
+        tf.random.set_seed(self.m_RandomSeedTensorflow)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def DefineAndBuildOneCNN( self
                             , a_CNNDefinition
                             , a_HyperParameterSet):
-        l_GeneralFunctions.PrintMethodSTART("myModelMGR.BuildOneCNN()", "=", 1, 0)
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.DefineAndBuildOneCNN()", "=", 1, 0)
 
         l_NumFiltersListStr = a_CNNDefinition[0]["NumFiltersList"]
         l_NumFiltersList = json.loads(l_NumFiltersListStr)
@@ -225,7 +230,7 @@ class myModelMGR:
 
             return [l_AutoEncoder, l_ModelBuildingTime]
 
-        l_GeneralFunctions.PrintMethodEND("myModelMGR.BuildOneCNN()", "=", 0, 0)
+        l_GeneralFunctions.PrintMethodEND("myModelMGR.DefineAndBuildOneCNN()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -400,7 +405,7 @@ class myModelMGR:
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def TrainOneCNN( self
-                   , a_TrainingCNNList
+                   , a_TrainOneCNNList
                    , a_HyperParameterSet
                    , a_ModelBuildingTime):
         l_GeneralFunctions.PrintMethodSTART("TrainOneCNN()", "=", 1, 0)
@@ -459,7 +464,7 @@ class myModelMGR:
 
         #l_FullPathCNNWeights = self.SaveCNNWeights(l_AutoEncoder, a_CNNParameters)
         l_FullPathCNNWeights = None
-        a_TrainingCNNList = [ l_AutoEncoder
+        a_TrainOneCNNList = [ l_AutoEncoder
                             , l_ModelTrainingTime
                             , l_History
                             , l_FullPathCNNWeights]
@@ -526,6 +531,7 @@ class myModelMGR:
 
         return data
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def TestOneCNNOnSingleExample_GPUVersion( self
@@ -662,6 +668,7 @@ class myModelMGR:
 
         l_GeneralFunctions.PrintMethodEND("TestOneCNNOnSingleExample_GPUVersion()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # - f.visititems() recursively visits every group and dataset in the file.
@@ -984,7 +991,6 @@ class myModelMGR:
                                                          , l_FullPathCurrentRecords
                                                          , a_ColumnWidths
                                                          , 'w')
-
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
