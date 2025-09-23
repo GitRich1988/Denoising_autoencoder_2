@@ -94,40 +94,17 @@ class myModelMGR:
                 l_CurrentCNNDefinition = self.m_ListOfCNNDefinitions[l_CNNIndex]
                 print(json.dumps(l_CurrentCNNDefinition, indent=2))
 
-                tf.keras.backend.clear_session()
-                np.random.seed(self.m_RandomSeedNumpy)
-                random.seed(self.m_RandomSeedRandom)
-                tf.random.set_seed(self.m_RandomSeedTensorflow)
-
-
-                # Build the model
                 l_AutoEncoder = None
                 l_ModelBuildingTime = 0
-                [l_AutoEncoder, l_ModelBuildingTime] = self.DefineAndBuildOneCNN( l_CurrentCNNDefinition
-                                                                                , l_CurrentHyperParameterSet)
-
-
-                # Train the model
-                l_ModelTrainingTime = 0;
-                l_History = None
-                l_FullPathCNNWeights = None
-                l_TrainingCNNList = [ l_AutoEncoder
-                                    , l_ModelTrainingTime
-                                    , l_History
-                                    , l_FullPathCNNWeights]
-                l_TrainingCNNList = self.TrainOneCNN( l_TrainingCNNList
-                                                    , l_CurrentHyperParameterSet
-                                                    , l_ModelBuildingTime)
-                l_AutoEncoder = l_TrainingCNNList[0]
-                l_ModelTrainingTime = l_TrainingCNNList[1]
-
-
-                # Save CNN weights to file
-                ##self.DisplayCNNWeightsFromFile(l_FullPathCNNWeightsEarlierRun)
-                ##self.SaveCNNWeights(l_AutoEncoder, a_CNNParameters)
-                self.SaveFirstFewCNNWeights( l_AutoEncoder
-                                           , l_CurrentCNNDefinition)
-
+                l_ModelTrainingTime = 0
+                l_ModelAndTimes = [l_AutoEncoder, l_ModelBuildingTime, l_ModelTrainingTime]
+                l_ModelAndTimes = [l_AutoEncoder, l_ModelBuildingTime, l_ModelTrainingTime]
+                self.DefineBuildAndTrainOneCNN( l_CurrentCNNDefinition
+                                              , l_CurrentHyperParameterSet
+                                              , l_ModelAndTimes)
+                l_AutoEncoder = l_ModelAndTimes[0]
+                l_ModelBuildingTime = l_ModelAndTimes[1]
+                l_ModelTrainingTime = l_ModelAndTimes[2]
 
                 # Test the model on a single example
                 l_ExampleIndex = 0
@@ -142,6 +119,50 @@ class myModelMGR:
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def DefineBuildAndTrainOneCNN( self
+                                 , a_CNNDefinition
+                                 , a_HyperParameterSet
+                                 , a_ModelAndTimes):
+        # Reset random seeds
+        tf.keras.backend.clear_session()
+        np.random.seed(self.m_RandomSeedNumpy)
+        random.seed(self.m_RandomSeedRandom)
+        tf.random.set_seed(self.m_RandomSeedTensorflow)
+
+
+        # Build the model
+        l_AutoEncoder = None
+        l_ModelBuildingTime = 0
+        [l_AutoEncoder, l_ModelBuildingTime] = self.DefineAndBuildOneCNN( a_CNNDefinition
+                                                                        , a_HyperParameterSet)
+
+
+        # Train the model
+        l_ModelTrainingTime = 0;
+        l_History = None
+        l_FullPathCNNWeights = None
+        l_TrainingCNNList = [ l_AutoEncoder
+                            , l_ModelTrainingTime
+                            , l_History
+                            , l_FullPathCNNWeights]
+        l_TrainingCNNList = self.TrainOneCNN( l_TrainingCNNList
+                                            , a_HyperParameterSet
+                                            , l_ModelBuildingTime)
+        l_AutoEncoder = l_TrainingCNNList[0]
+        l_ModelTrainingTime = l_TrainingCNNList[1]
+
+        a_ModelAndTimes[0] = l_AutoEncoder
+        a_ModelAndTimes[1] = l_ModelBuildingTime
+        a_ModelAndTimes[2] = l_ModelTrainingTime
+
+        # Save CNN weights to file
+        ##self.DisplayCNNWeightsFromFile(l_FullPathCNNWeightsEarlierRun)
+        ##self.SaveCNNWeights(l_AutoEncoder, a_CNNParameters)
+        self.SaveFirstFewCNNWeights( l_AutoEncoder
+                                   , a_CNNDefinition)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def DefineAndBuildOneCNN( self
