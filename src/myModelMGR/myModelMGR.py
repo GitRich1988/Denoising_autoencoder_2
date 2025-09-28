@@ -22,19 +22,23 @@ import ast
 class myModelMGR:
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    def __init__(self, a_DataSetMGR):
+    def __init__( self
+                , a_DataSetMGR
+                , a_FileNameCNNDefinition
+                , a_FileNameHyperParameterSet):
         l_GeneralFunctions.PrintMethodSTART("myModelMGR.__init__()", "=", 1, 0)
 
         self.m_DataSetMGR = a_DataSetMGR
         self.m_ListOfHyperParameterSets = []
         self.m_ListOfCNNDefinitions = []
-        #self.m_DirHyperParameterSets = "C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/Training_info/"
-        self.m_DirHyperParameterSets = "Training_info/Hyper_parameters/"
-        self.m_DirCNNDefinitions = "Training_info/CNN_definitions/"
-        self.m_RandomSeedNumpy = 42
-        self.m_RandomSeedRandom = 42
-        self.m_RandomSeedTensorflow = 42
-        self.m_NominalRadius = 1
+        self.m_DirHyperParameterSets = ""
+        self.m_DirCNNDefinitions = ""
+        self.m_FileNameCNNDefinition = a_FileNameCNNDefinition
+        self.m_FileNameHyperParameterSet = a_FileNameHyperParameterSet
+        self.m_RandomSeedNumpy = 0
+        self.m_RandomSeedRandom =0
+        self.m_RandomSeedTensorflow = 0
+        self.m_NominalRadius = 0
 
         self.Initialise()
 
@@ -43,16 +47,34 @@ class myModelMGR:
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # Key input locations:
+    # C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/Training_info/CNN_definitions/
+    # C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/Training_info/Hyper_parameters/
+    #
+    # Key output locations:
+    # C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/Training_info/Model_records/...
+    # C:/Users/marti/Documents/Machine_learning/Work_stuff/Log_files/<Data_set_name>/Point_data/...
     def Initialise(self):
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Initialise()", "=", 1, 0)
+
+        self.m_DirHyperParameterSets = "Training_info/Hyper_parameters/"
+        self.m_DirCNNDefinitions = "Training_info/CNN_definitions/"
+        self.m_RandomSeedNumpy = 42
+        self.m_RandomSeedRandom = 42
+        self.m_RandomSeedTensorflow = 42
+        self.m_NominalRadius = 1
+
         self.SetListOfHyperParameterSets()
         self.SetListOfCNNDefinitions()
+
+        l_GeneralFunctions.PrintMethodEND("myModelMGR.Initialise()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfHyperParameterSets(self):
 
-        l_FullPathHyperParametersFile = self.m_DirHyperParameterSets + "Hyper_parameters_1.json"
+        l_FullPathHyperParametersFile = self.m_DirHyperParameterSets + self.m_FileNameHyperParameterSet
 
         with open(l_FullPathHyperParametersFile, 'r') as f:
             l_JSONData = json.load(f)
@@ -63,7 +85,7 @@ class myModelMGR:
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfCNNDefinitions(self):
 
-        l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + "CNN_definition_1.json"
+        l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + self.m_FileNameCNNDefinitions
 
         with open(l_FullPathCNNDefinitionsFile, 'r') as f:
             l_JSONData = json.load(f)
@@ -73,7 +95,7 @@ class myModelMGR:
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def Run(self):
-        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Run()", "=", 0, 0)
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Run()", "=", 1, 0)
 
         print("len(self.m_ListOfCNNDefinitions):", len(self.m_ListOfCNNDefinitions))
 
@@ -125,6 +147,8 @@ class myModelMGR:
                                  , a_CNNDefinition
                                  , a_HyperParameterSet
                                  , a_ModelAndTimes):
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.DefineBuildAndTrainOneCNN()", "=", 1, 0)
+
         # Reset random seeds
         self.ResetRandomSeeds()
 
@@ -157,6 +181,8 @@ class myModelMGR:
         ##self.SaveCNNWeights(l_AutoEncoder, a_CNNParameters)
         self.SaveFirstFewCNNWeights( l_AutoEncoder
                                    , a_CNNDefinition)
+
+        l_GeneralFunctions.PrintMethodEND("myModelMGR.DefineBuildAndTrainOneCNN()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -374,6 +400,8 @@ class myModelMGR:
                    , a_HyperParameterSet # a_HyperParameterSet is equivalent to the old a_CNNParameters arg
                    ):
 
+        l_GeneralFunctions.PrintMethodSTART("BuildOneCNN()", "=", 1, 0)
+
         #l_InputLayer = a_CNNArchitecture.m_InputLayer
         #l_DecodedLayer = a_CNNArchitecture.m_DecodedLayer
         l_InputLayer = a_CNNArchitecture[0]
@@ -400,8 +428,11 @@ class myModelMGR:
         #print("Model dtype policy:", l_AutoEncoder.dtype_policy)
 
         l_ModelBuildingTime = l_EndTimeBuilding - l_StartTimeBuilding
+
+        l_GeneralFunctions.PrintMethodEND("BuildOneCNN()", "=", 0, 0)
         return [l_AutoEncoder, l_ModelBuildingTime]
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def TrainOneCNN( self
