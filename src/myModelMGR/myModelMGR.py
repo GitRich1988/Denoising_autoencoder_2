@@ -580,6 +580,8 @@ class myModelMGR:
                                             , a_CurrentHyperParameterSet):
         l_GeneralFunctions.PrintMethodSTART("TestOneCNNOnSingleExample_GPUVersion()", "=", 1, 0)
 
+        # !!! CAN MOVE RESULTS-WRITING STUFF OUT INTO A myResultsMGR CLASS LATER?
+
         with tf.device('/GPU:0'):
             # Read in the raw example point data - this part could be done with GPU, could improve later
             #l_FilePathsRawDataSingleFile = []
@@ -901,37 +903,15 @@ class myModelMGR:
                               10, 10, 10, 10, 10, 20,
                               20]
 
-            l_Columns=[ 'DateTimeOverall'
-                      , 'DateTimeCurrent'
-                      , 'Num_Epochs'
-                      , 'Batch_Size'
-                      , 'Activation'
-                      , 'Loss'
-                      , 'Optimizer'
-                      , 'Radius_Raw'
-                      , 'Radius_RCNom'
-                      , 'Radius_Denoised'
-                      , 'Circularity_Raw'
-                      , 'Circularity_Denoised'
-                      , 'MnSqDev_Raw'
-                      , 'MnSqDev_Denoised'
-                      , 'MeanXYRadial_Raw'
-                      , 'XYRMSDevFromOwnMean_Raw'
-                      , 'XYRMSDevFromRCNom_Raw'
-                      , 'MeanXYRadial_Denoised'
-                      , 'XYRMSDevFromOwnMean_Denoised'
-                      , 'XYRMSDevFromRCNom_Denoised'
-                      , 'CentreX_Raw'
-                      , 'CentreY_Raw'
-                      , 'CentreZ_Raw'
-                      , 'CentreX_Denoised'
-                      , 'CentreY_Denoised'
-                      , 'Centrez_Denoised'
-                      , 'Build_Time'
-                      , 'Train_Time'
-                      , 'Test_Time'
-                      , 'Num_Filters'
-                      , 'Kernel_Sizes' ]
+            l_Columns=[ 'DateTimeOverall', 'DateTimeCurrent', 'Num_Epochs', 'Batch_Size'
+                      , 'Activation', 'Loss', 'Optimizer', 'Radius_Raw'
+                      , 'Radius_RCNom', 'Radius_Denoised', 'Circularity_Raw', 'Circularity_Denoised'
+                      , 'MnSqDev_Raw', 'MnSqDev_Denoised', 'MeanXYRadial_Raw', 'XYRMSDevFromOwnMean_Raw'
+                      , 'XYRMSDevFromRCNom_Raw', 'MeanXYRadial_Denoised', 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNom_Denoised'
+                      , 'CentreX_Raw', 'CentreY_Raw', 'CentreZ_Raw'
+                      , 'CentreX_Denoised', 'CentreY_Denoised', 'Centrez_Denoised'
+                      , 'Build_Time', 'Train_Time', 'Test_Time'
+                      , 'Num_Filters', 'Kernel_Sizes' ]
 
             l_NewLineDataFrame = pd.DataFrame( [l_Data]
                                              , l_Columns)
@@ -960,8 +940,6 @@ class myModelMGR:
                                                     , l_Columns
                                                     , a_CurrentHyperParameterSet)
 
-            #FINALISE THESE TOMORROW (27/07/2025):
-
             l_JSON = {}
             self.SetJSONOutputSingleExample( l_JSON                              
                                            , a_DateTimeStampOverall
@@ -975,7 +953,8 @@ class myModelMGR:
                                            , a_ModelTrainingTime
                                            , a_ModelTestingTime)
 
-            self.WriteJSONDataForDenoisedExample(l_JSON, a_DirCNNIndex)
+            self.WriteJSONDataForDenoisedExample( l_JSON
+                                                , a_DirCNNIndex)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -1043,31 +1022,17 @@ class myModelMGR:
                                            , a_Columns
                                            , a_CurrentHyperParameterSet):
 
-        l_QuantityNames=[ 'Radius_Raw'
-                        , 'Radius_RCNom'
-                        , 'Radius_Denoised'
-                        , 'Circularity_Raw'
-                        , 'Circularity_Denoised'
-                        , 'MnSqDev_Raw'
-                        , 'MnSqDev_Denoised'
-                        , 'MeanXYRadial_Raw'
-                        , 'XYRMSDevFromOwnMean_Raw'
-                        , 'XYRMSDevFromRCNom_Raw'
-                        , 'MeanXYRadial_Denoised'
-                        , 'XYRMSDevFromOwnMean_Denoised'
-                        , 'XYRMSDevFromRCNom_Denoised'
-                        , 'CentreX_Raw'
-                        , 'CentreY_Raw'
-                        , 'CentreZ_Raw'
-                        , 'CentreX_Denoised'
-                        , 'CentreY_Denoised'
-                        , 'Centrez_Denoised'
-                        , 'Build_Time'
-                        , 'Train_Time'
-                        , 'Test_Time' ]
+        l_QuantityNames=[ 'Radius_Raw', 'Radius_RCNom', 'Radius_Denoised'
+                        , 'Circularity_Raw', 'Circularity_Denoised'
+                        , 'MnSqDev_Raw', 'MnSqDev_Denoised', 'MeanXYRadial_Raw'
+                        , 'XYRMSDevFromOwnMean_Raw', 'XYRMSDevFromRCNom_Raw', 'MeanXYRadial_Denoised'
+                        , 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNom_Denoised'
+                        , 'CentreX_Raw', 'CentreY_Raw', 'CentreZ_Raw'
+                        , 'CentreX_Denoised', 'CentreY_Denoised', 'Centrez_Denoised'
+                        , 'Build_Time', 'Train_Time', 'Test_Time' ]
 
 
-        # NOT QUITE RIGHT - THIS LOOP IS MAKING 10 LINES BE WRITTEN FOR EACH INTENDED 1 LINE
+        # NOT QUITE RIGHT - THIS LOOP IS MAKING 10 LINES BE WRITTEN FOR EACH INTENDED 1 LINE - STILL TRUE 28/09/2025?
         for i in range(0, len(l_QuantityNames)):
             l_CurrentQuantityName = l_QuantityNames[i]
             l_CurrentQuantityColumnIndex = a_Columns.index(l_CurrentQuantityName)
@@ -1223,6 +1188,8 @@ class myModelMGR:
                                    , a_DateTimeStampOverall
                                    , a_CurrentHyperParameterSet):
 
+        # !!! SHOULD PERHAPS FIT THE POINTS FIRST THEN USE THE FITTED RADIUS AS THE 'MEAN XY RADIUS' - 28/09/2025
+
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRCNom = myCircleParameters()
@@ -1250,8 +1217,9 @@ class myModelMGR:
         print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
         print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
         print("l_CircleParametersDenoised.m_Radius:           ", l_CircleParametersDenoised.m_Radius)
-        print("l_CircleParametersRaw.m_XYRMSDevFromRCNom:     ", l_CircleParametersRaw.m_RMSDevFromRCNom)
-        print("l_CircleParametersDenoised.m_XYRMSDevFromRCNom:", l_CircleParametersDenoised.m_RMSDevFromRCNom)
+        print("l_CircleParametersRaw.m_RMSDevFromRCNom):      ", l_CircleParametersRaw.m_RMSDevFromRCNom)
+        print("l_CircleParametersDenoised.m_RMSDevFromRCNom:  ", l_CircleParametersDenoised.m_RMSDevFromRCNom)
+        print("")
 
         self.WriteResultsForCNNParameters( a_CNNParameters
                                          , l_CircleParametersRaw
@@ -1283,47 +1251,61 @@ class myModelMGR:
                                   , a_ModelTrainingTime
                                   , a_ModelTestingTime):
 
-        a_JSON['DateTimeOverall'] = a_DateTimeStampOverall
-        a_JSON['DateTimeCurrent'] = a_DateTimeStampCurrentCNN
-        a_JSON['Num_Epochs'] = a_CurrentHyperParameterSet[0]['NumEpochs']
-        a_JSON['Batch_Size'] = a_CurrentHyperParameterSet[0]['TrainingBatchSize']
-        a_JSON['Activation'] = a_CurrentHyperParameterSet[0]['ActivationFunction']
-        #a_JSON['Loss'] = self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction)
-        a_JSON['Loss'] = a_CurrentHyperParameterSet[0]['LossFunction']
-        a_JSON['Optimizer'] = a_CurrentHyperParameterSet[0]['Optimizer']
-        a_JSON['Radius_Raw'] = round(a_CircleParametersRaw.m_Radius, 4)
-        a_JSON['Radius_RCNom'] = round(a_CircleParametersRCNominal.m_Radius, 4)
-        a_JSON['Radius_Denoised'] = round(a_CircleParametersDenoised.m_Radius, 4)
-        a_JSON['Circularity_Raw'] = round(a_CircleParametersRaw.m_Circularity, 4)
-        a_JSON['Circularity_Denoised'] = round(a_CircleParametersDenoised.m_Circularity, 4)
-        #a_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_MeanSquareDeviation, 4)
-        a_JSON['MnSqDev_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromTrueNom , 4)
-        #a_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4)
-        a_JSON['MnSqDev_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4)
-        #a_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8)
-        a_JSON['MeanXYRadial_Raw'] = round(a_CircleParametersRaw.m_XYRadialMean, 8)
-        #a_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8)
-        a_JSON['XYRMSDevFromOwnMean_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
-        #a_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8)
-        a_JSON['XYRMSDevFromRCNom_Raw'] = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
-        #a_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8)
-        a_JSON['MeanXYRadial_Denoised'] = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
-        #a_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8)
-        a_JSON['XYRMSDevFromOwnMean_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
-        #a_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8)
-        a_JSON['XYRMSDevFromRCNom_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
-        a_JSON['CentreX_Raw'] = round(a_CircleParametersRaw.m_CentreX, 4)
-        a_JSON['CentreY_Raw'] = round(a_CircleParametersRaw.m_CentreY, 4)
-        a_JSON['CentreZ_Raw'] = round(a_CircleParametersRaw.m_CentreZ, 4)
-        a_JSON['CentreX_Denoised'] = round(a_CircleParametersDenoised.m_CentreX, 4)
-        a_JSON['CentreY_Denoised'] = round(a_CircleParametersDenoised.m_CentreY, 4)
-        a_JSON['Centrez_Denoised'] = round(a_CircleParametersDenoised.m_CentreZ, 4)
-        a_JSON['Build_Time'] = round(a_ModelBuildingTime, 6)
-        a_JSON['Train_Time'] = round(a_ModelTrainingTime, 6)
-        a_JSON['Test_Time'] = round(a_ModelTestingTime, 6)
-        #a_JSON['Num_Filters'] = a_CurrentCNNParameters.m_NumFiltersList
-        a_JSON['Num_Filters'] = a_CurrentCNNParameters[0]['NumFiltersList']
-        #a_JSON['Kernel_Sizes'] = a_CurrentCNNParameters.m_KernelSizeList
-        a_JSON['Kernel_Sizes'] = a_CurrentCNNParameters[0]['KernelSizesList']
+        l_GeneralFunctions.PrintMethodSTART("SetJSONOutputSingleExample()", "=", 1, 0)
+
+        a_JSON['DateTimeOverall']               = a_DateTimeStampOverall
+        a_JSON['DateTimeCurrent']               = a_DateTimeStampCurrentCNN
+        a_JSON['Num_Epochs']                    = a_CurrentHyperParameterSet[0]['NumEpochs']
+        a_JSON['Batch_Size']                    = a_CurrentHyperParameterSet[0]['TrainingBatchSize']
+        a_JSON['Activation']                    = a_CurrentHyperParameterSet[0]['ActivationFunction']
+        #a_JSON['Loss']                         = self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction)
+        a_JSON['Loss']                          = a_CurrentHyperParameterSet[0]['LossFunction']
+        a_JSON['Optimizer']                     = a_CurrentHyperParameterSet[0]['Optimizer']
+        a_JSON['Num_Filters']                   = a_CurrentCNNParameters[0]['NumFiltersList']
+        a_JSON['Kernel_Sizes']                  = a_CurrentCNNParameters[0]['KernelSizesList']
+        a_JSON['Build_Time']                    = round(a_ModelBuildingTime, 6)
+        a_JSON['Train_Time']                    = round(a_ModelTrainingTime, 6)
+        a_JSON['Test_Time']                     = round(a_ModelTestingTime, 6)
+
+        # Fitted circle parameters
+        a_JSON['Radius_Raw']                    = round(a_CircleParametersRaw.m_Radius, 6)
+        a_JSON['Radius_RCNom']                  = round(a_CircleParametersRCNominal.m_Radius, 6)
+        a_JSON['Radius_Denoised']               = round(a_CircleParametersDenoised.m_Radius, 6)
+
+        a_JSON['CentreX_Raw']                   = round(a_CircleParametersRaw.m_CentreX, 4)
+        a_JSON['CentreY_Raw']                   = round(a_CircleParametersRaw.m_CentreY, 4)
+        a_JSON['CentreZ_Raw']                   = round(a_CircleParametersRaw.m_CentreZ, 4)
+
+        a_JSON['CentreX_Denoised']              = round(a_CircleParametersDenoised.m_CentreX, 4)
+        a_JSON['CentreY_Denoised']              = round(a_CircleParametersDenoised.m_CentreY, 4)
+        a_JSON['Centrez_Denoised']              = round(a_CircleParametersDenoised.m_CentreZ, 4)
+
+        # Circularity [UNSURE IF CALCULATED CORRECTLY]
+        a_JSON['Circularity_Raw']               = round(a_CircleParametersRaw.m_Circularity, 4)
+        a_JSON['Circularity_Denoised']          = round(a_CircleParametersDenoised.m_Circularity, 4)
+
+        # Mean XY radial distance of points from nominal centre
+        a_JSON['MeanXYRadialDist_Raw']              = round(a_CircleParametersRaw.m_XYRadialMean, 8)
+        a_JSON['MeanXYRadialDist_RCNom']            = round(a_CircleParametersRCNominal.m_XYRadialMean, 8)       
+        a_JSON['MeanXYRadialDist_Denoised']         = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
+
+        # RMS deviation from nominal radius
+        a_JSON['RMSDevFromTrueNom_Raw']         = round(a_CircleParametersRaw.m_RMSDevFromTrueNom , 6)
+        a_JSON['RMSDevFromTrueNom_RCNom']       = round(a_CircleParametersRCNominal.m_RMSDevFromTrueNom , 6)
+        a_JSON['RMSDevFromTrueNom_Denoised']    = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 6)
+        
+        # RMS deviation of points from mean XY radius
+        a_JSON['RMSDevFromXYRadialMean_Raw']    = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
+        a_JSON['RMSDevFromXYRadialMean_RCNom']  = round(a_CircleParametersRCNominal.m_RMSDevFromXYRadialMean, 8)
+        a_JSON['RMSDevFromXYRadialMean_Denoised']  = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
+        
+        # RMS deviation of points from corresponding RCNom points
+        a_JSON['RMSDevFromRCNom_Raw']           = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
+        a_JSON['RMSDevFromRCNom_RCNom']         = round(a_CircleParametersRCNominal.m_RMSDevFromRCNom, 8)
+        a_JSON['RMSDevFromRCNom_Denoised']      = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
+
+        print(json.dumps(a_JSON, indent=2))
+
+        l_GeneralFunctions.PrintMethodEND("SetJSONOutputSingleExample()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================

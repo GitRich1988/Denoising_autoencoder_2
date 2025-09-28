@@ -72,7 +72,6 @@ class myCircleParameters:
             self.SetRMSDevPointToPoint( a_TestingExampleRCNom
                                       , l_RMSDevFromRCNom)
             self.m_RMSDevFromRCNom = l_RMSDevFromRCNom[0]
-
     #--------------------------------------------------------------------------
 
 
