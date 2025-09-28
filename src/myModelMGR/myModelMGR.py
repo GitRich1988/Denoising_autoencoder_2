@@ -55,7 +55,7 @@ class myModelMGR:
     # C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/Training_info/Model_records/...
     # C:/Users/marti/Documents/Machine_learning/Work_stuff/Log_files/<Data_set_name>/Point_data/...
     def Initialise(self):
-        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Initialise()", "=", 1, 0)
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Initialise()", "=", 0, 0)
 
         self.m_DirHyperParameterSets = "Training_info/Hyper_parameters/"
         self.m_DirCNNDefinitions = "Training_info/CNN_definitions/"
@@ -85,7 +85,7 @@ class myModelMGR:
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfCNNDefinitions(self):
 
-        l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + self.m_FileNameCNNDefinitions
+        l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + self.m_FileNameCNNDefinition
 
         with open(l_FullPathCNNDefinitionsFile, 'r') as f:
             l_JSONData = json.load(f)
@@ -94,22 +94,28 @@ class myModelMGR:
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    def Run(self):
-        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Run()", "=", 1, 0)
-
-        print("len(self.m_ListOfCNNDefinitions):", len(self.m_ListOfCNNDefinitions))
-
+    def ListAvailableGPUs(self):
         # List available GPUs
         l_GPUs = tf.config.list_physical_devices('GPU')
         if l_GPUs:
             print(f"TensorFlow is using the following GPU(s): {l_GPUs}")
-            #print("\nTraining and testing single CNN...")
+        else:
+            print("No GPU detected")
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def Run(self):
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.Run()", "=", 1, 0)
+
+        self.ListAvailableGPUs()
+        print("len(self.m_ListOfCNNDefinitions):", len(self.m_ListOfCNNDefinitions))
+        print("len(self.m_ListOfHyperParameterSets):", len(self.m_ListOfHyperParameterSets))
 
         for l_HyperParameterSetIndex in range(0, len(self.m_ListOfHyperParameterSets)):
             print("\n===============================================================\nl_HyperParameterSetIndex: ", l_HyperParameterSetIndex)
             l_CurrentHyperParameterSet = self.m_ListOfHyperParameterSets[l_HyperParameterSetIndex]
-            #print(json.dumps(l_CurrentHyperParameterSet, indent=2))
+            print(json.dumps(l_CurrentHyperParameterSet, indent=2))
 
             for l_CNNIndex in range(0, len(self.m_ListOfCNNDefinitions)):
                 print("\n---------------------------------------------------------------\nl_CNNIndex: ", l_CNNIndex)
@@ -254,9 +260,8 @@ class myModelMGR:
             [l_AutoEncoder, l_ModelBuildingTime] = self.BuildOneCNN( l_CNNArchitecture
                                                                    , a_HyperParameterSet) 
 
-            return [l_AutoEncoder, l_ModelBuildingTime]
-
         l_GeneralFunctions.PrintMethodEND("myModelMGR.DefineAndBuildOneCNN()", "=", 0, 0)
+        return [l_AutoEncoder, l_ModelBuildingTime]
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -479,7 +484,7 @@ class myModelMGR:
         # Now fit the model
         #self.ResetAllRandomSeeds(self.m_RandomSeed)
 
-        l_AutoEncoder = a_TrainingCNNList[0]
+        l_AutoEncoder = a_TrainOneCNNList[0]
         weights_before = l_AutoEncoder.layers[1].get_weights()[0].copy()
         l_History = l_AutoEncoder.fit( train_dataset
                                      #, epochs=self.m_HyperParameters.m_NumEpochs
@@ -503,7 +508,7 @@ class myModelMGR:
         self.m_LoadedTrainingDataRawAndRCNom = train_dataset # unsure if necessary?
 
         l_GeneralFunctions.PrintMethodEND("TrainOneCNN()", "=", 0, 0)
-        return a_TrainingCNNList
+        return a_TrainOneCNNList
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -667,21 +672,17 @@ class myModelMGR:
                                                                  , self.m_DataSetMGR.m_NumFeaturesPerPoint)
 
 
-            print("\nraw data frame first 3 rows:\n", l_FilePathRawData)
+            print("\nRaw data frame first 3 rows:\n", l_FilePathRawData)
             print(l_TestingExampleRaw[0, 0:3, :])
             print("\nRCNom data frame first 3 rows:\n", l_FilePathRCNomData)
             print(l_TestingExampleRCNom[0, 0:3, :])
-            print("\ndenoised prediction first 3 rows:\n", l_DenoisedExampleFullPath)
+            print("\nDenoised prediction first 3 rows:\n", l_DenoisedExampleFullPath)
             print(l_DenoisedPrediction[0, 0:3, :])
 
             if isinstance(l_TestingExampleRaw, tf.Tensor):
                 l_TestingExampleRaw = l_TestingExampleRaw.numpy()  # Convert to NumPy
                 #l_TestingExampleRaw = l_TestingExampleRaw.astype(np.float64)
                 l_TestingExampleRaw = l_TestingExampleRaw.astype(np.float32)
-
-            print("type(l_TestingExampleRaw):", type(l_TestingExampleRaw))
-            print("type(l_TestingExampleRCNom):", type(l_TestingExampleRCNom))
-            print("type(l_DenoisedPrediction):", type(l_DenoisedPrediction))
 
             self.SetAndWriteFittedParameters( l_TestingExampleRaw
                                             , l_TestingExampleRCNom

@@ -14,7 +14,7 @@ class myCircleParameters:
 
     #--------------------------------------------------------------------------
     def __init__(self):
-        l_GeneralFunctions.PrintMethodSTART("myCircleParameters.__init__()", "=", 0, 0)
+        #l_GeneralFunctions.PrintMethodSTART("myCircleParameters.__init__()", "=", 0, 0)
 
         self.m_PointData = pd.DataFrame()
 
@@ -41,7 +41,7 @@ class myCircleParameters:
         self.m_RMSDevFromRCNom = 0
         self.m_Circularity = 0
 
-        l_GeneralFunctions.PrintMethodEND("myCircleParameters.__init__()", "=", 0, 0)
+        #l_GeneralFunctions.PrintMethodEND("myCircleParameters.__init__()", "=", 0, 0)
     #--------------------------------------------------------------------------
 
 
@@ -49,12 +49,12 @@ class myCircleParameters:
     def Initialise( self
                   , a_PointData
                   , a_NominalRadius):
-        l_GeneralFunctions.PrintMethodSTART("myCircleParameters.Initialise()", "=", 1, 0)
+        #l_GeneralFunctions.PrintMethodSTART("myCircleParameters.Initialise()", "=", 1, 0)
 
         self.m_PointData = a_PointData
         self.m_NominalRadius = a_NominalRadius
 
-        l_GeneralFunctions.PrintMethodEND("myCircleParameters.Initialise()", "=", 0, 0)
+        #l_GeneralFunctions.PrintMethodEND("myCircleParameters.Initialise()", "=", 0, 0)
     #--------------------------------------------------------------------------
 
 
@@ -78,7 +78,7 @@ class myCircleParameters:
 
     #--------------------------------------------------------------------------
     def SetXYRadialDistances(self):
-        l_GeneralFunctions.PrintMethodSTART("myCircleParameters.SetXYRadialDistances()", "=", 1, 0)
+        #l_GeneralFunctions.PrintMethodSTART("myCircleParameters.SetXYRadialDistances()", "=", 1, 0)
 
         for l_PointIndex in range(0, len(self.m_PointData)):
             l_CurrentX = self.m_PointData[l_PointIndex][0]
@@ -93,7 +93,7 @@ class myCircleParameters:
 
             self.m_XYRadialDistancesNomCentre.append(l_RadialDistance)
 
-        l_GeneralFunctions.PrintMethodEND("myCircleParameters.SetXYRadialDistances()", "=", 0, 0)
+        #l_GeneralFunctions.PrintMethodEND("myCircleParameters.SetXYRadialDistances()", "=", 0, 0)
     #--------------------------------------------------------------------------
 
 
@@ -187,21 +187,20 @@ class myCircleParameters:
             center (tuple): (x, y) coordinates of the circle center.
             radius (float): Radius of the fitted circle.
         """
-        points = np.asarray(self.m_PointData[:,0:2])
-        print("points.shape:", points.shape)
+        l_Points = np.asarray(self.m_PointData[:,0:2])
     
         # Initial guess: center at mean of points, radius as mean distance to center
-        x_m, y_m = np.mean(points, axis=0)
-        r_guess = np.mean(np.sqrt((points[:,0] - x_m)**2 + (points[:,1] - y_m)**2))
+        x_m, y_m = np.mean(l_Points, axis=0)
+        r_guess = np.mean(np.sqrt((l_Points[:,0] - x_m)**2 + (l_Points[:,1] - y_m)**2))
         initial_guess = [x_m, y_m, r_guess]
 
         def residuals(params):
             x0, y0, r = params
-            return np.sqrt((points[:,0] - x0)**2 + (points[:,1] - y0)**2) - r
+            return np.sqrt((l_Points[:,0] - x0)**2 + (l_Points[:,1] - y0)**2) - r
 
-        result = least_squares(residuals, initial_guess)
+        l_Result = least_squares(residuals, initial_guess)
 
-        x0, y0, r = result.x
+        x0, y0, r = l_Result.x
         return (x0, y0), r
     #--------------------------------------------------------------------------
 

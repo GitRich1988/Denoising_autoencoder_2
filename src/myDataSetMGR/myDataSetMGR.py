@@ -12,7 +12,7 @@ class myDataSetMGR:
 
     #--------------------------------------------------------------------------
     def __init__(self, a_DataSetName):
-        l_GeneralFunctions.PrintMethodSTART("myDataSetMGR.__init__()", "=", 0, 0)
+        l_GeneralFunctions.PrintMethodSTART("myDataSetMGR.__init__()", "=", 1, 0)
 
         self.m_DataSetName = a_DataSetName
         self.m_DirAllDataSets = l_ProjectInfo.GetDirLogFiles()
@@ -136,8 +136,8 @@ class myDataSetMGR:
         self.m_ListOfTestingExampleIndices = sorted(self.m_ListOfTestingExampleIndices)
         #print("self.m_ListOfTrainingExampleIndices:\n", self.m_ListOfTrainingExampleIndices)
         #print("\nself.m_ListOfTestingExampleIndices:\n", self.m_ListOfTestingExampleIndices)
-        print("\nlen(self.m_ListOfTrainingExampleIndices):", len(self.m_ListOfTrainingExampleIndices))
-        print("len(self.m_ListOfTestingExampleIndices):   ", len(self.m_ListOfTestingExampleIndices))
+        print("len(self.m_ListOfTrainingExampleIndices):           ", len(self.m_ListOfTrainingExampleIndices))
+        print("len(self.m_ListOfTestingExampleIndices):            ", len(self.m_ListOfTestingExampleIndices))
     #--------------------------------------------------------------------------
 
 
@@ -149,10 +149,10 @@ class myDataSetMGR:
         self.m_ListOfPointDataExampleDirsRCNomTraining = [self.m_ListOfPointDataExampleDirsRCNom[i] for i in self.m_ListOfTrainingExampleIndices]
         self.m_ListOfPointDataExampleDirsRCNomTesting = [self.m_ListOfPointDataExampleDirsRCNom[i] for i in self.m_ListOfTestingExampleIndices]
 
-        print("len(self.m_ListOfPointDataExampleDirsRawTraining):   ", len(self.m_ListOfPointDataExampleDirsRawTraining))
-        print("len(self.m_ListOfPointDataExampleDirsRawTesting):    ", len(self.m_ListOfPointDataExampleDirsRawTesting))
-        print("len(self.m_ListOfPointDataExampleDirsRCNomTraining):   ", len(self.m_ListOfPointDataExampleDirsRCNomTraining))
-        print("len(self.m_ListOfPointDataExampleDirsRCNomTesting):    ", len(self.m_ListOfPointDataExampleDirsRCNomTesting))
+        print("len(self.m_ListOfPointDataExampleDirsRawTraining):  ", len(self.m_ListOfPointDataExampleDirsRawTraining))
+        print("len(self.m_ListOfPointDataExampleDirsRawTesting):   ", len(self.m_ListOfPointDataExampleDirsRawTesting))
+        print("len(self.m_ListOfPointDataExampleDirsRCNomTraining):", len(self.m_ListOfPointDataExampleDirsRCNomTraining))
+        print("len(self.m_ListOfPointDataExampleDirsRCNomTesting): ", len(self.m_ListOfPointDataExampleDirsRCNomTesting))
 
         self.SortDirPathsByExampleIDNumber(self.m_ListOfPointDataExampleDirsRawTraining)
         self.SortDirPathsByExampleIDNumber(self.m_ListOfPointDataExampleDirsRawTesting)
@@ -191,9 +191,9 @@ class myDataSetMGR:
             self.m_ListOfPointDataFullPathsRawTesting.append(l_CurrentFullPath)
 
         self.m_ListOfPointDataFullPathsRawAll = self.m_ListOfPointDataFullPathsRawTraining + self.m_ListOfPointDataFullPathsRawTesting
-        print("len(self.m_ListOfPointDataFullPathsRawTraining):", len(self.m_ListOfPointDataFullPathsRawTraining))
-        print("len(self.m_ListOfPointDataFullPathsRawTesting): ", len(self.m_ListOfPointDataFullPathsRawTesting))
-        print("len(self.m_ListOfPointDataFullPathsRawAll):     ", len(self.m_ListOfPointDataFullPathsRawAll))
+        print("len(self.m_ListOfPointDataFullPathsRawTraining):    ", len(self.m_ListOfPointDataFullPathsRawTraining))
+        print("len(self.m_ListOfPointDataFullPathsRawTesting):     ", len(self.m_ListOfPointDataFullPathsRawTesting))
+        print("len(self.m_ListOfPointDataFullPathsRawAll):         ", len(self.m_ListOfPointDataFullPathsRawAll))
         self.SortDirPathsByExampleIDNumber(self.m_ListOfPointDataFullPathsRawAll)
     #--------------------------------------------------------------------------
 
@@ -215,9 +215,9 @@ class myDataSetMGR:
             self.m_ListOfPointDataFullPathsRCNomTesting.append(l_CurrentFullPath)
 
         self.m_ListOfPointDataFullPathsRCNomAll= self.m_ListOfPointDataFullPathsRCNomTraining + self.m_ListOfPointDataFullPathsRCNomTesting
-        print("len(self.m_ListOfPointDataFullPathsRCNomTraining):", len(self.m_ListOfPointDataFullPathsRCNomTraining))
-        print("len(self.m_ListOfPointDataFullPathsRCNomTesting): ", len(self.m_ListOfPointDataFullPathsRCNomTesting))
-        print("len(self.m_ListOfPointDataFullPathsRCNomAll):     ", len(self.m_ListOfPointDataFullPathsRCNomAll))
+        print("len(self.m_ListOfPointDataFullPathsRCNomTraining):  ", len(self.m_ListOfPointDataFullPathsRCNomTraining))
+        print("len(self.m_ListOfPointDataFullPathsRCNomTesting):   ", len(self.m_ListOfPointDataFullPathsRCNomTesting))
+        print("len(self.m_ListOfPointDataFullPathsRCNomAll):       ", len(self.m_ListOfPointDataFullPathsRCNomAll))
         self.SortDirPathsByExampleIDNumber(self.m_ListOfPointDataFullPathsRCNomAll)
     #--------------------------------------------------------------------------
 

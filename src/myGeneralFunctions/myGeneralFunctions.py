@@ -196,11 +196,11 @@ class myGeneralFunctions:
         if not os.path.exists(a_DirPath):
             try:
                 os.makedirs(a_DirPath)
-                print(f"Directory created: {a_DirPath}")
+                print(f"Directory created:\n{a_DirPath}")
             except Exception as e:
-                print(f"Failed to create directory {a_DirPath}: {e}")
-        else:
-            print(f"Directory already exists: {a_DirPath}")
+                print(f"Failed to create directory:\n{a_DirPath}: {e}")
+        #else:
+        #    print(f"Directory already exists:\n{a_DirPath}")
     #--------------------------------------------------------------------------
 
     
