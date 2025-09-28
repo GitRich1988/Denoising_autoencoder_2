@@ -1197,6 +1197,7 @@ class myModelMGR:
         l_CircleParametersRCNom.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetCircleFittedParameters()
         l_CircleParametersRCNom.SetCircularity()
+        l_CircleParametersRCNom.PrintAllValues("l_CircleParametersRCNom")
 
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
@@ -1205,6 +1206,7 @@ class myModelMGR:
         l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircleFittedParameters()
         l_CircleParametersRaw.SetCircularity()
+        l_CircleParametersRaw.PrintAllValues("l_CircleParametersRaw")
 
         # Denoised
         l_DenoisedPrediction = a_DenoisedPrediction[0]
@@ -1213,13 +1215,7 @@ class myModelMGR:
         l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersDenoised.SetCircleFittedParameters()
         l_CircleParametersDenoised.SetCircularity()
-
-        print("\nl_CircleParametersRaw.m_Radius:                ", l_CircleParametersRaw.m_Radius)
-        print("l_CircleParametersRCNom.m_Radius:              ", l_CircleParametersRCNom.m_Radius)
-        print("l_CircleParametersDenoised.m_Radius:           ", l_CircleParametersDenoised.m_Radius)
-        print("l_CircleParametersRaw.m_RMSDevFromRCNom):      ", l_CircleParametersRaw.m_RMSDevFromRCNom)
-        print("l_CircleParametersDenoised.m_RMSDevFromRCNom:  ", l_CircleParametersDenoised.m_RMSDevFromRCNom)
-        print("")
+        l_CircleParametersDenoised.PrintAllValues("l_CircleParametersDenoised")
 
         self.WriteResultsForCNNParameters( a_CNNParameters
                                          , l_CircleParametersRaw
@@ -1290,7 +1286,7 @@ class myModelMGR:
         a_JSON['MeanXYRadialDist_Denoised']         = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
 
         # RMS deviation from nominal radius
-        a_JSON['RMSDevFromTrueNom_Raw']         = round(a_CircleParametersRaw.m_RMSDevFromTrueNom , 6)
+        a_JSON['RMSDevFromTrueNom_Raw']         = round(a_CircleParametersRaw.m_RMSDevFromTrueNom, 6)
         a_JSON['RMSDevFromTrueNom_RCNom']       = round(a_CircleParametersRCNominal.m_RMSDevFromTrueNom , 6)
         a_JSON['RMSDevFromTrueNom_Denoised']    = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 6)
         

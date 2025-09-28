@@ -106,7 +106,7 @@ class myCircleParameters:
     #--------------------------------------------------------------------------
     def SetXYRootMeanSquareDeviationFromFixedRadius( self
                                                    , a_FixedRadius
-                                                   , a_RMS):
+                                                   , a_RMSList):
 
         l_SumSquaredDeviations = 0
         for l_PointIndex in range(0, len(self.m_XYRadialDistancesNomCentre)):
@@ -115,21 +115,25 @@ class myCircleParameters:
             l_SumSquaredDeviations += l_CurrentDeviationSquared
 
         l_MeanSquaredDeviation = l_SumSquaredDeviations / len(self.m_XYRadialDistancesNomCentre)
-        a_RMS = math.sqrt(l_MeanSquaredDeviation);
+        a_RMSList[0] = math.sqrt(l_MeanSquaredDeviation);
     #--------------------------------------------------------------------------
 
 
     #--------------------------------------------------------------------------
     def SetXYRootMeanSquareDeviationFromOwnXYRadialMean( self):
+        l_List = [0]
         self.SetXYRootMeanSquareDeviationFromFixedRadius( self.m_XYRadialMean
-                                                        , self.m_RMSDevFromXYRadialMean)
+                                                        , l_List)
+        self.m_RMSDevFromXYRadialMean = l_List[0]
     #--------------------------------------------------------------------------
 
 
     #--------------------------------------------------------------------------
     def SetXYRootMeanSquareDeviationFromTrueNom(self):
+        l_List = [0]
         self.SetXYRootMeanSquareDeviationFromFixedRadius( self.m_NominalRadius
-                                                        , self.m_RMSDevFromTrueNom)
+                                                        , l_List)
+        self.m_RMSDevFromTrueNom = l_List[0]
     #--------------------------------------------------------------------------
 
     
@@ -226,5 +230,39 @@ class myCircleParameters:
         l_MaxNegativeDeviation = -1 * l_MaxNegativeDeviation
         if(l_MaxNegativeDeviation > l_MaxPositiveDeviation):
             self.m_Circularity = l_MaxNegativeDeviation
+    #--------------------------------------------------------------------------
+
+
+    #--------------------------------------------------------------------------
+    def PrintAllValues( self
+                      , a_Name = "NOT_SET"):
+
+        if(a_Name != "NOT_SET"):
+            print("\n------------------------\nFitted circle parameters:", a_Name)
+
+        print("m_PointData.shape:", self.m_PointData.shape)
+
+        print("m_CentreX:", self.m_CentreX)
+        print("m_CentreY:", self.m_CentreY)
+        print("m_CentreZ:", self.m_CentreZ)
+        print("m_I:", self.m_I)
+        print("m_J:", self.m_J)
+        print("m_K:", self.m_K)
+        print("m_Radius:", self.m_Radius)
+
+        print("m_NominalCentreX:", self.m_NominalCentreX)
+        print("m_NominalCentreY:", self.m_NominalCentreY)
+        print("m_NominalCentreZ:", self.m_NominalCentreZ)
+        print("m_NominalI:", self.m_NominalI)
+        print("m_NominalJ:", self.m_NominalJ)
+        print("m_NominalK:", self.m_NominalK)
+        print("m_NominalRadius:", self.m_NominalRadius)
+
+        print("len(self.m_XYRadialDistancesNomCentre):", len(self.m_XYRadialDistancesNomCentre))
+        print("m_XYRadialMean:", self.m_XYRadialMean)
+        print("m_RMSDevFromXYRadialMean:", self.m_RMSDevFromXYRadialMean)
+        print("m_RMSDevFromTrueNom:", self.m_RMSDevFromTrueNom)
+        print("m_RMSDevFromRCNom:", self.m_RMSDevFromRCNom)
+        print("m_Circularity:", self.m_Circularity)
     #--------------------------------------------------------------------------
 #==============================================================================
