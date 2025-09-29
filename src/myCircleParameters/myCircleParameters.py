@@ -37,8 +37,9 @@ class myCircleParameters:
         self.m_XYRadialDistancesNomCentre = []
         self.m_XYRadialMean = 0
         self.m_RMSDevFromXYRadialMean = 0
-        self.m_RMSDevFromTrueNom = 0
-        self.m_RMSDevFromRCNom = 0
+        self.m_RMSDevFromNomRadius = 0
+        self.m_RMSDevFromRCNomPts = 0
+        self.m_RMSDevFromFittedRadius = 0
         self.m_Circularity = 0
 
         #l_GeneralFunctions.PrintMethodEND("myCircleParameters.__init__()", "=", 0, 0)
@@ -65,13 +66,14 @@ class myCircleParameters:
         self.SetXYRadialMean()
         self.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
         self.SetXYRootMeanSquareDeviationFromTrueNom()
+        self.SetXYRootMeanSquareDeviationFromOwnFittedRadius()
 
         if a_TestingExampleRCNom is not None:
-            l_RMSDevFromRCNom = []
-            l_RMSDevFromRCNom.append(0)
+            l_RMSDevFromRCNomPts = []
+            l_RMSDevFromRCNomPts.append(0)
             self.SetRMSDevPointToPoint( a_TestingExampleRCNom
-                                      , l_RMSDevFromRCNom)
-            self.m_RMSDevFromRCNom = l_RMSDevFromRCNom[0]
+                                      , l_RMSDevFromRCNomPts)
+            self.m_RMSDevFromRCNomPts = l_RMSDevFromRCNomPts[0]
     #--------------------------------------------------------------------------
 
 
@@ -133,9 +135,16 @@ class myCircleParameters:
         l_List = [0]
         self.SetXYRootMeanSquareDeviationFromFixedRadius( self.m_NominalRadius
                                                         , l_List)
-        self.m_RMSDevFromTrueNom = l_List[0]
+        self.m_RMSDevFromNomRadius = l_List[0]
     #--------------------------------------------------------------------------
 
+    #--------------------------------------------------------------------------
+    def SetXYRootMeanSquareDeviationFromOwnFittedRadius(self):
+        l_List = [0]
+        self.SetXYRootMeanSquareDeviationFromFixedRadius( self.m_Radius
+                                                        , l_List)
+        self.m_RMSDevFromFittedRadius = l_List[0]
+    #--------------------------------------------------------------------------
     
     #--------------------------------------------------------------------------
     def SetRMSDevPointToPoint( self
@@ -261,8 +270,8 @@ class myCircleParameters:
         print("len(self.m_XYRadialDistancesNomCentre):", len(self.m_XYRadialDistancesNomCentre))
         print("m_XYRadialMean:", self.m_XYRadialMean)
         print("m_RMSDevFromXYRadialMean:", self.m_RMSDevFromXYRadialMean)
-        print("m_RMSDevFromTrueNom:", self.m_RMSDevFromTrueNom)
-        print("m_RMSDevFromRCNom:", self.m_RMSDevFromRCNom)
+        print("m_RMSDevFromNomRadius:", self.m_RMSDevFromNomRadius)
+        print("m_RMSDevFromRCNomPts:", self.m_RMSDevFromRCNomPts)
         print("m_Circularity:", self.m_Circularity)
     #--------------------------------------------------------------------------
 #==============================================================================

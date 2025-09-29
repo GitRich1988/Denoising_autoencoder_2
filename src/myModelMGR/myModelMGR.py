@@ -143,6 +143,14 @@ class myModelMGR:
                                                          , l_ExampleIndex
                                                          , l_CNNIndex
                                                          , l_CurrentHyperParameterSet)
+                """
+                self.TestOneCNNOnBatches_GPUVersion( l_AutoEncoder
+                                                   , l_CurrentCNNDefinition
+                                                   , l_ModelBuildingTime
+                                                   , l_ModelTrainingTime
+                                                   , l_CNNIndex
+                                                   , l_CurrentHyperParameterSet)
+                """
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -858,8 +866,8 @@ class myModelMGR:
                 round(a_CircleParametersRaw.m_Circularity, 4),
                 round(a_CircleParametersDenoised.m_Circularity, 4),
 
-                round(a_CircleParametersRaw.m_RMSDevFromTrueNom, 4),
-                round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4),
+                round(a_CircleParametersRaw.m_RMSDevFromNomRadius, 4),
+                round(a_CircleParametersDenoised.m_RMSDevFromNomRadius, 4),
 
                 #round(a_CircleParametersRaw.m_MeanSquareDeviation, 4),
                 #round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4),
@@ -872,16 +880,16 @@ class myModelMGR:
                 #round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8),
                 round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8),
 
-                #round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8),
-                round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8),
+                #round(a_CircleParametersRaw.m_XYRMSDevFromRCNomPts, 8),
+                round(a_CircleParametersRaw.m_RMSDevFromRCNomPts, 8),
 
                 #round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8),
                 round(a_CircleParametersDenoised.m_XYRadialMean, 8),
                 
                 #round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8),
-                #round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8),
+                #round(a_CircleParametersDenoised.m_XYRMSDevFromRCNomPts, 8),
                 round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8),
-                round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8),
+                round(a_CircleParametersDenoised.m_RMSDevFromRCNomPts, 8),
 
                 round(a_CircleParametersRaw.m_CentreX, 4),
                 round(a_CircleParametersRaw.m_CentreY, 4),
@@ -907,7 +915,7 @@ class myModelMGR:
                       , 'Activation', 'Loss', 'Optimizer', 'Radius_Raw'
                       , 'Radius_RCNom', 'Radius_Denoised', 'Circularity_Raw', 'Circularity_Denoised'
                       , 'MnSqDev_Raw', 'MnSqDev_Denoised', 'MeanXYRadial_Raw', 'XYRMSDevFromOwnMean_Raw'
-                      , 'XYRMSDevFromRCNom_Raw', 'MeanXYRadial_Denoised', 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNom_Denoised'
+                      , 'XYRMSDevFromRCNomPts_Raw', 'MeanXYRadial_Denoised', 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNomPts_Denoised'
                       , 'CentreX_Raw', 'CentreY_Raw', 'CentreZ_Raw'
                       , 'CentreX_Denoised', 'CentreY_Denoised', 'Centrez_Denoised'
                       , 'Build_Time', 'Train_Time', 'Test_Time'
@@ -1025,8 +1033,8 @@ class myModelMGR:
         l_QuantityNames=[ 'Radius_Raw', 'Radius_RCNom', 'Radius_Denoised'
                         , 'Circularity_Raw', 'Circularity_Denoised'
                         , 'MnSqDev_Raw', 'MnSqDev_Denoised', 'MeanXYRadial_Raw'
-                        , 'XYRMSDevFromOwnMean_Raw', 'XYRMSDevFromRCNom_Raw', 'MeanXYRadial_Denoised'
-                        , 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNom_Denoised'
+                        , 'XYRMSDevFromOwnMean_Raw', 'XYRMSDevFromRCNomPts_Raw', 'MeanXYRadial_Denoised'
+                        , 'XYRMSDevFromOwnMean_Denoised', 'XYRMSDevFromRCNomPts_Denoised'
                         , 'CentreX_Raw', 'CentreY_Raw', 'CentreZ_Raw'
                         , 'CentreX_Denoised', 'CentreY_Denoised', 'Centrez_Denoised'
                         , 'Build_Time', 'Train_Time', 'Test_Time' ]
@@ -1051,28 +1059,28 @@ class myModelMGR:
                 l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_Circularity, 4)
             if(l_CurrentQuantityName == 'MnSqDev_Raw'):
                 #l_CurrentQuantityValue = round(a_CircleParametersRaw.m_MeanSquareDeviation, 4)
-                l_CurrentQuantityValue = round(a_CircleParametersRaw.m_RMSDevFromTrueNom, 4)
+                l_CurrentQuantityValue = round(a_CircleParametersRaw.m_RMSDevFromNomRadius, 4)
             if(l_CurrentQuantityName == 'MnSqDev_Denoised'):
                 #l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_MeanSquareDeviation, 4)
-                l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 4)
+                l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_RMSDevFromNomRadius, 4)
             if(l_CurrentQuantityName == 'MeanXYRadial_Raw'):
                 #l_CurrentQuantityValue = round(a_CircleParametersRaw.m_MeanXYRadialDistance, 8)
                 l_CurrentQuantityValue = round(a_CircleParametersRaw.m_XYRadialMean, 8)
             if(l_CurrentQuantityName == 'XYRMSDevFromOwnMean_Raw'):
                 #l_CurrentQuantityValue = round(a_CircleParametersRaw.m_XYRMSDevFromOwnMean, 8)
                 l_CurrentQuantityValue = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
-            if(l_CurrentQuantityName == 'XYRMSDevFromRCNom_Raw'):
-                #l_CurrentQuantityValue = round(a_CircleParametersRaw.m_XYRMSDevFromRCNom, 8)
-                l_CurrentQuantityValue = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
+            if(l_CurrentQuantityName == 'XYRMSDevFromRCNomPts_Raw'):
+                #l_CurrentQuantityValue = round(a_CircleParametersRaw.m_XYRMSDevFromRCNomPts, 8)
+                l_CurrentQuantityValue = round(a_CircleParametersRaw.m_RMSDevFromRCNomPts, 8)
             if(l_CurrentQuantityName == 'MeanXYRadial_Denoised'):
                 #l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8)
                 l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
             if(l_CurrentQuantityName == 'XYRMSDevFromOwnMean_Denoised'):
                 #l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8)
                 l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
-            if(l_CurrentQuantityName == 'XYRMSDevFromRCNom_Denoised'):
-                #l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_XYRMSDevFromRCNom, 8)
-                l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
+            if(l_CurrentQuantityName == 'XYRMSDevFromRCNomPts_Denoised'):
+                #l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_XYRMSDevFromRCNomPts, 8)
+                l_CurrentQuantityValue = round(a_CircleParametersDenoised.m_RMSDevFromRCNomPts, 8)
             if(l_CurrentQuantityName == 'CentreX_Raw'):
                 l_CurrentQuantityValue = round(a_CircleParametersRaw.m_CentreX, 4)
             if(l_CurrentQuantityName == 'CentreY_Raw'):
@@ -1281,24 +1289,29 @@ class myModelMGR:
         a_JSON['Circularity_Denoised']          = round(a_CircleParametersDenoised.m_Circularity, 4)
 
         # Mean XY radial distance of points from nominal centre
-        a_JSON['MeanXYRadialDist_Raw']              = round(a_CircleParametersRaw.m_XYRadialMean, 8)
-        a_JSON['MeanXYRadialDist_RCNom']            = round(a_CircleParametersRCNominal.m_XYRadialMean, 8)       
-        a_JSON['MeanXYRadialDist_Denoised']         = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
+        a_JSON['MeanXYRadialDist_Raw']          = round(a_CircleParametersRaw.m_XYRadialMean, 8)
+        a_JSON['MeanXYRadialDist_RCNom']        = round(a_CircleParametersRCNominal.m_XYRadialMean, 8)       
+        a_JSON['MeanXYRadialDist_Denoised']     = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
 
         # RMS deviation from nominal radius
-        a_JSON['RMSDevFromTrueNom_Raw']         = round(a_CircleParametersRaw.m_RMSDevFromTrueNom, 6)
-        a_JSON['RMSDevFromTrueNom_RCNom']       = round(a_CircleParametersRCNominal.m_RMSDevFromTrueNom , 6)
-        a_JSON['RMSDevFromTrueNom_Denoised']    = round(a_CircleParametersDenoised.m_RMSDevFromTrueNom, 6)
+        a_JSON['RMSDevFromNomRadius_Raw']       = round(a_CircleParametersRaw.m_RMSDevFromNomRadius, 6)
+        a_JSON['RMSDevFromNomRadius_RCNom']     = round(a_CircleParametersRCNominal.m_RMSDevFromNomRadius , 6)
+        a_JSON['RMSDevFromNomRadius_Denoised']  = round(a_CircleParametersDenoised.m_RMSDevFromNomRadius, 6)
         
+        # RMS deviation from fitted radius
+        a_JSON['RMSDevFromFittedRadius_Raw']    = round(a_CircleParametersRaw.m_RMSDevFromFittedRadius, 6)
+        a_JSON['RMSDevFromFittedRadius_RCNom']  = round(a_CircleParametersRCNominal.m_RMSDevFromFittedRadius, 6)
+        a_JSON['RMSDevFromFittedRadius_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromFittedRadius, 6)
+
         # RMS deviation of points from mean XY radius
         a_JSON['RMSDevFromXYRadialMean_Raw']    = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
         a_JSON['RMSDevFromXYRadialMean_RCNom']  = round(a_CircleParametersRCNominal.m_RMSDevFromXYRadialMean, 8)
-        a_JSON['RMSDevFromXYRadialMean_Denoised']  = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
+        a_JSON['RMSDevFromXYRadialMean_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
         
         # RMS deviation of points from corresponding RCNom points
-        a_JSON['RMSDevFromRCNom_Raw']           = round(a_CircleParametersRaw.m_RMSDevFromRCNom, 8)
-        a_JSON['RMSDevFromRCNom_RCNom']         = round(a_CircleParametersRCNominal.m_RMSDevFromRCNom, 8)
-        a_JSON['RMSDevFromRCNom_Denoised']      = round(a_CircleParametersDenoised.m_RMSDevFromRCNom, 8)
+        a_JSON['RMSDevFromRCNomPts_Raw']        = round(a_CircleParametersRaw.m_RMSDevFromRCNomPts, 8)
+        a_JSON['RMSDevFromRCNomPts_RCNom']      = round(a_CircleParametersRCNominal.m_RMSDevFromRCNomPts, 8)
+        a_JSON['RMSDevFromRCNomPts_Denoised']   = round(a_CircleParametersDenoised.m_RMSDevFromRCNomPts, 8)
 
         print(json.dumps(a_JSON, indent=2))
 
