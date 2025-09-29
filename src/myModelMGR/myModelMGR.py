@@ -135,6 +135,7 @@ class myModelMGR:
                 l_ModelTrainingTime = l_ModelAndTimes[2]
 
                 # Test the model on a single example
+                """
                 l_ExampleIndex = 0
                 self.TestOneCNNOnSingleExample_GPUVersion( l_AutoEncoder
                                                          , l_CurrentCNNDefinition
@@ -150,7 +151,7 @@ class myModelMGR:
                                                    , l_ModelTrainingTime
                                                    , l_CNNIndex
                                                    , l_CurrentHyperParameterSet)
-                """
+                
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -1316,5 +1317,64 @@ class myModelMGR:
         print(json.dumps(a_JSON, indent=2))
 
         l_GeneralFunctions.PrintMethodEND("SetJSONOutputSingleExample()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def TestOneCNNOnBatches_GPUVersion( self
+                                      , a_AutoEncoder
+                                      , a_CurrentCNNDefinition
+                                      , a_ModelBuildingTime
+                                      , a_ModelTrainingTime
+                                      , a_CNNIndex
+                                      , a_CurrentHyperParameterSet):
+
+        l_GeneralFunctions.PrintMethodSTART("TestOneCNNOnBatches_GPUVersion()", "=", 3, 0)
+
+        l_TestingBatchSize = int(a_CurrentHyperParameterSet[0]["TestingBatchSize"])
+
+        print("l_TestingBatchSize:", l_TestingBatchSize) 
+        #l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_FilePathsRawDataTesting) 
+        l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting) 
+        print("len(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting):", len(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting))
+        print("m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting[0]:\n", self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting[0])
+
+        l_TestDataset = l_TestDataset.map(self.load_and_parse).batch(l_TestingBatchSize)
+        # Do I really need to use the same batch size for testing as I have used for training? 
+        # # Probably not, but it is easier to keep it the same for now. 
+        
+        with tf.device('/GPU:0'): 
+            l_NumTestingExamplesHandled = 0 
+            l_BatchIndex = 0 
+            for l_CurrentBatch in l_TestDataset: 
+                l_BatchIndex += 1 
+
+                #if(l_BatchIndex > 1): 
+                    # TESTING ONLY 
+                    # break 
+                    
+                print("--> l_BatchIndex =", l_BatchIndex, " - l_NumTestingExamplesHandled =", l_NumTestingExamplesHandled) 
+                l_CurrentBatch.shape 
+                print("--> l_CurrentBatch.shape:", l_CurrentBatch.shape) 
+                
+                # Train on current training batch... 
+                l_BatchDenoisingTimeStart = time.time() 
+                print("--> Passing current batch of testing set examples to trained model now to make predictions on...") 
+                
+                l_DenoisedPredictions = a_AutoEncoder(l_CurrentBatch) 
+                l_BatchDenoisingTimeEnd = time.time() 
+                l_BatchDenoisingTimeTaken = l_BatchDenoisingTimeEnd - l_BatchDenoisingTimeStart 
+                l_MeanDenoisedPredictionTimeTakenPerExampleInBatch = l_BatchDenoisingTimeTaken / l_TestingBatchSize 
+                print("--> Time taken to make denoised predictions on current testing batch:", l_BatchDenoisingTimeTaken) 
+                print("--> Mean time taken to predict denoised result for one example in batch:", l_MeanDenoisedPredictionTimeTakenPerExampleInBatch) 
+                print("--> Will now calculate fitted circle parameters for Raw, RCNom, Denoised circles and write to file...") 
+                print("\nl_DenoisedPredictions[0].shape:", l_DenoisedPredictions[0].shape) 
+                print("l_DenoisedPredictions[0, 0:3,:]:\n",l_DenoisedPredictions[0, 0:3,:]) 
+                print("\nl_DenoisedPredictions[1].shape:", l_DenoisedPredictions[1].shape) 
+                print("l_DenoisedPredictions[1, 0:3,:]:\n",l_DenoisedPredictions[1, 0:3,:])
+
+                # NEED TO IMPLEMENT WRITING RESULTS TO FILE HERE
+
+        l_GeneralFunctions.PrintMethodEND("TestOneCNNOnBatches_GPUVersion()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================

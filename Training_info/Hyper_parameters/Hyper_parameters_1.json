@@ -5,6 +5,6 @@
 	"ActivationFunction": "relu",
 	"LossFunction": "mean_squared_error",
 	"Optimizer": "adam",
-	"TestingBatchSize": "1"	
+	"TestingBatchSize": "10"	
 }
 ]

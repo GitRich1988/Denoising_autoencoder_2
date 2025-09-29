@@ -8,7 +8,7 @@ class myProjectInfo:
         None
 
     def GetProjectDir(self):
-       return "C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder/"
+       return "C:/Users/marti/Documents/Machine_learning/Denoising_autoencoder_2/"
 
     def GetDirLogFiles(self):
         return "C:/Users/marti/Documents/Machine_learning/Work_stuff/Log_files/"
