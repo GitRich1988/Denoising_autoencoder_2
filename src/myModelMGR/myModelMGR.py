@@ -1354,27 +1354,179 @@ class myModelMGR:
                     # break 
                     
                 print("--> l_BatchIndex =", l_BatchIndex, " - l_NumTestingExamplesHandled =", l_NumTestingExamplesHandled) 
-                l_CurrentBatch.shape 
-                print("--> l_CurrentBatch.shape:", l_CurrentBatch.shape) 
+                #print("--> l_CurrentBatch.shape:", l_CurrentBatch.shape) 
                 
                 # Train on current training batch... 
-                l_BatchDenoisingTimeStart = time.time() 
-                print("--> Passing current batch of testing set examples to trained model now to make predictions on...") 
-                
+                #print("--> Passing current batch of testing set examples to trained model now to make predictions on...") 
+                l_DateTimeStampCurrentBatchTest = l_GeneralFunctions.GetCurrentDateTimeStamp()
+                l_BatchDenoisingTimeStart = time.time()
                 l_DenoisedPredictions = a_AutoEncoder(l_CurrentBatch) 
                 l_BatchDenoisingTimeEnd = time.time() 
                 l_BatchDenoisingTimeTaken = l_BatchDenoisingTimeEnd - l_BatchDenoisingTimeStart 
                 l_MeanDenoisedPredictionTimeTakenPerExampleInBatch = l_BatchDenoisingTimeTaken / l_TestingBatchSize 
-                print("--> Time taken to make denoised predictions on current testing batch:", l_BatchDenoisingTimeTaken) 
-                print("--> Mean time taken to predict denoised result for one example in batch:", l_MeanDenoisedPredictionTimeTakenPerExampleInBatch) 
-                print("--> Will now calculate fitted circle parameters for Raw, RCNom, Denoised circles and write to file...") 
-                print("\nl_DenoisedPredictions[0].shape:", l_DenoisedPredictions[0].shape) 
-                print("l_DenoisedPredictions[0, 0:3,:]:\n",l_DenoisedPredictions[0, 0:3,:]) 
-                print("\nl_DenoisedPredictions[1].shape:", l_DenoisedPredictions[1].shape) 
-                print("l_DenoisedPredictions[1, 0:3,:]:\n",l_DenoisedPredictions[1, 0:3,:])
+                #print("--> Time taken to make denoised predictions on current testing batch:", l_BatchDenoisingTimeTaken) 
+                #print("--> Mean time taken to predict denoised result for one example in batch:", l_MeanDenoisedPredictionTimeTakenPerExampleInBatch) 
+                #print("--> Will now calculate fitted circle parameters for Raw, RCNom, Denoised circles and write to file...") 
+                #print("\nl_DenoisedPredictions[0].shape:", l_DenoisedPredictions[0].shape) 
+                #print("l_DenoisedPredictions[0, 0:3,:]:\n",l_DenoisedPredictions[0, 0:3,:]) 
+                #print("\nl_DenoisedPredictions[1].shape:", l_DenoisedPredictions[1].shape) 
+                #print("l_DenoisedPredictions[1, 0:3,:]:\n",l_DenoisedPredictions[1, 0:3,:])
 
                 # NEED TO IMPLEMENT WRITING RESULTS TO FILE HERE
 
+                self.WriteTestingBatchResultsToFile( l_DenoisedPredictions
+                                                   , l_NumTestingExamplesHandled
+                                                   , l_TestingBatchSize
+                                                   , a_AutoEncoder
+                                                   , a_CurrentCNNDefinition
+                                                   , a_ModelBuildingTime
+                                                   , a_ModelTrainingTime
+                                                   , a_CNNIndex
+                                                   , a_CurrentHyperParameterSet
+                                                   , l_MeanDenoisedPredictionTimeTakenPerExampleInBatch
+                                                   , l_DateTimeStampCurrentBatchTest)
+
+                l_NumTestingExamplesHandled += l_TestingBatchSize
+
         l_GeneralFunctions.PrintMethodEND("TestOneCNNOnBatches_GPUVersion()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def WriteTestingBatchResultsToFile( self
+                                      , a_DenoisedPredictions
+                                      , a_NumTestingExamplesHandled
+                                      , a_TestingBatchSize
+                                      , a_AutoEncoder # maybe unnecessary
+                                      , a_CurrentCNNDefinition
+                                      , a_ModelBuildingTime
+                                      , a_ModelTrainingTime
+                                      , a_CNNIndex
+                                      , a_CurrentHyperParameterSet
+                                      , a_MeanDenoisingTimeTaken
+                                      , a_DateTimeStampCurrentBatchTest):
+
+        l_GeneralFunctions.PrintMethodSTART("WriteTestingBatchResultsToFile()", "=", 1, 0)
+
+        print("a_DenoisedPredictions.shape:", a_DenoisedPredictions.shape)
+
+        for l_ExampleInBatchIndex in range(0, a_TestingBatchSize):
+            #l_CurrentDenoisedPrediction = a_DenoisedPredictions[l_ExampleInBatchIndex]
+            l_TestingSetIndex = a_NumTestingExamplesHandled + l_ExampleInBatchIndex
+            l_ExampleIndex = self.m_DataSetMGR.m_ListOfTestingExampleIndices[l_TestingSetIndex]
+
+            self.WriteSingleTestingExampleResultsToFile( #l_CurrentDenoisedPrediction
+                                                         a_DenoisedPredictions
+                                                       , l_ExampleIndex
+                                                       , a_CNNIndex
+                                                       , a_CurrentCNNDefinition
+                                                       , a_ModelBuildingTime
+                                                       , a_ModelTrainingTime
+                                                       , a_CurrentHyperParameterSet
+                                                       , a_MeanDenoisingTimeTaken
+                                                       , a_DateTimeStampCurrentBatchTest
+                                                       , l_ExampleInBatchIndex)
+
+        l_GeneralFunctions.PrintMethodEND("WriteTestingBatchResultsToFile()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def WriteSingleTestingExampleResultsToFile( self
+                                              #a_DenoisedPrediction
+                                              , a_DenoisedPredictions
+                                              , a_ExampleIndex
+                                              , a_CNNIndex
+                                              , a_CNNParameters
+                                              , a_ModelBuildingTime
+                                              , a_ModelTrainingTime
+                                              , a_CurrentHyperParameterSet
+                                              , a_MeanDenoisingTimeTaken
+                                              , a_DateTimeStampCurrentBatchTest
+                                              , a_ExampleInBatchIndex):
+
+        # Write the denoised prediction to file and read in the raw and RCNom data for circle parameter calculations
+
+        #l_FilePathRawData = self.m_FilePathsRawData[a_ExampleIndex]
+        l_FilePathRawData = self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex]
+        #l_FilePathRCNomData = self.m_FilePathsRCNomData[a_ExampleIndex]
+        l_FilePathRCNomData = self.m_DataSetMGR.m_ListOfPointDataFullPathsRCNomAll[a_ExampleIndex]
+        l_FileName = l_GeneralFunctions.GetFileNameFromFullPath(l_FilePathRawData)
+
+        #l_ExampleFolder = self.m_DirDataSets + "Csy_" + str(a_ExampleIndex) + "/"
+        l_ExampleFolder = self.m_DataSetMGR.m_DirPointData + "Csy_" + str(a_ExampleIndex) + "/"
+            
+        l_DenoisedExampleFolder = l_ExampleFolder + "Denoised_data/"
+        l_GeneralFunctions.MakeDirIfNonExistent(l_DenoisedExampleFolder)
+        l_DateTimeStampDenoisedFileFolder = l_DenoisedExampleFolder + self.m_DataSetMGR.m_DateTimeStampOverall + "/"
+        l_GeneralFunctions.MakeDirIfNonExistent(l_DateTimeStampDenoisedFileFolder)
+        l_DateTimeStampDenoisedFileFolder = l_DenoisedExampleFolder + self.m_DataSetMGR.m_DateTimeStampOverall + "/"
+        l_GeneralFunctions.MakeDirIfNonExistent(l_DateTimeStampDenoisedFileFolder)
+        l_DirCNNIndex = l_DateTimeStampDenoisedFileFolder + "CNN_index_" + str(a_CNNIndex) + "/"
+        l_GeneralFunctions.MakeDirIfNonExistent(l_DirCNNIndex)
+        l_DenoisedExampleFullPath  = l_DirCNNIndex + l_FileName
+
+        #l_DenoisedPredictionPandasDF = pd.DataFrame(a_DenoisedPredictions[0]) # Need a Pandas dataframe, not a Numpy dataframe
+        l_DenoisedPredictionPandasDF = pd.DataFrame(a_DenoisedPredictions[a_ExampleInBatchIndex]) # Need a Pandas dataframe, not a Numpy dataframe
+        l_ColumnWidths = [10, 10, 10, 10, 10, 10]
+        l_DenoisedPredictionPandasDF = l_DenoisedPredictionPandasDF.round(6)
+
+        #l_GeneralFunctions.WriteDataFrameToFile( l_DenoisedPredictionPandasDF
+        l_GeneralFunctions.WritePandasDataFrameToFile( l_DenoisedPredictionPandasDF
+                                                     , l_DenoisedExampleFullPath
+                                                     , l_ColumnWidths
+                                                     , 'w')
+
+
+        # Read in Raw data
+        l_RawDataFullPath = self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex]
+        l_TestingExampleRaw = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_RawDataFullPath, a_Header=None)
+        l_TestingExampleRaw = l_TestingExampleRaw.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
+        l_TestingExampleRaw = l_TestingExampleRaw.to_numpy()
+        l_TestingExampleRaw = l_TestingExampleRaw.reshape( 1
+                                                         , self.m_DataSetMGR.m_NumRowsPerExampleDataFrame
+                                                         , self.m_DataSetMGR.m_NumFeaturesPerPoint)
+
+        # Read in RCNom data
+        #l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoDataframe(l_FilePathRCNomData)
+        l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_FilePathRCNomData)
+            
+        l_TestingExampleRCNom = l_TestingExampleRCNom.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
+        l_TestingExampleRCNom = l_TestingExampleRCNom.to_numpy()
+        l_TestingExampleRCNom = l_TestingExampleRCNom.reshape( 1
+                                                             #, self.m_NumRowsPerExampleDataFrame
+                                                             , self.m_DataSetMGR.m_NumRowsPerExampleDataFrame
+                                                             #, 6
+                                                             , self.m_DataSetMGR.m_NumFeaturesPerPoint)
+
+
+        print("\nRaw data frame first 3 rows:\n", l_FilePathRawData)
+        print(l_TestingExampleRaw[0, 0:3, :])
+        print("\nRCNom data frame first 3 rows:\n", l_FilePathRCNomData)
+        print(l_TestingExampleRCNom[0, 0:3, :])
+        print("\nDenoised prediction first 3 rows:\n", l_DenoisedExampleFullPath)
+        #print(a_DenoisedPrediction[0, 0:3, :])
+        #print(a_DenoisedPrediction[0:3, :])
+        print(a_DenoisedPredictions[a_ExampleInBatchIndex, 0:3, :])
+
+        if isinstance(l_TestingExampleRaw, tf.Tensor):
+            l_TestingExampleRaw = l_TestingExampleRaw.numpy()  # Convert to NumPy
+            #l_TestingExampleRaw = l_TestingExampleRaw.astype(np.float64)
+            l_TestingExampleRaw = l_TestingExampleRaw.astype(np.float32)
+
+        self.SetAndWriteFittedParameters( l_TestingExampleRaw
+                                        , l_TestingExampleRCNom
+                                        #, a_DenoisedPrediction
+                                        , a_DenoisedPredictions[a_ExampleInBatchIndex]
+                                        , a_CNNParameters
+                                        , a_ModelBuildingTime
+                                        , a_ModelTrainingTime
+                                        , a_ExampleIndex
+                                        , a_CNNIndex
+                                        , a_MeanDenoisingTimeTaken
+                                        , l_DirCNNIndex
+                                        , a_DateTimeStampCurrentBatchTest
+                                        , self.m_DataSetMGR.m_DateTimeStampOverall
+                                        , a_CurrentHyperParameterSet)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
