@@ -1197,28 +1197,25 @@ class myModelMGR:
                                    , a_DateTimeStampOverall
                                    , a_CurrentHyperParameterSet):
 
-        # !!! SHOULD PERHAPS FIT THE POINTS FIRST THEN USE THE FITTED RADIUS AS THE 'MEAN XY RADIUS' - 28/09/2025
+        # !!! SHOULD PERHAPS FIT THE POINTS FIRST THEN USE THE FITTED RADIUS AS THE 'MEAN XY RADIUS'
 
         # RCNom
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRCNom = myCircleParameters()
         l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom, self.m_NominalRadius)
         l_CircleParametersRCNom.SetCircleFittedParameters()
-        """
         l_CircleParametersRCNom.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetCircularity()
         #l_CircleParametersRCNom.PrintAllValues("l_CircleParametersRCNom")
-        """
+
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRaw = myCircleParameters()
         l_CircleParametersRaw.Initialise(l_TestingExampleRaw, self.m_NominalRadius)
         l_CircleParametersRaw.SetCircleFittedParameters()
-        """
         l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircularity()
         #l_CircleParametersRaw.PrintAllValues("l_CircleParametersRaw")
-        """
 
         # Denoised
         #l_DenoisedPrediction = a_DenoisedPrediction[0]
@@ -1226,11 +1223,10 @@ class myModelMGR:
         l_CircleParametersDenoised = myCircleParameters()
         l_CircleParametersDenoised.Initialise(l_DenoisedPrediction, self.m_NominalRadius)
         l_CircleParametersDenoised.SetCircleFittedParameters()
-        """
         l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersDenoised.SetCircularity()
         #l_CircleParametersDenoised.PrintAllValues("l_CircleParametersDenoised")
-        """
+
         self.WriteResultsForCNNParameters( a_CNNParameters
                                          , l_CircleParametersRaw
                                          , l_CircleParametersRCNom

@@ -67,7 +67,7 @@ class myCircleParameters:
         self.SetXYRootMeanSquareDeviationFromOwnXYRadialMean()
         self.SetXYRootMeanSquareDeviationFromTrueNom()
         self.SetXYRootMeanSquareDeviationFromOwnFittedRadius()
-
+   
         if a_TestingExampleRCNom is not None:
             l_RMSDevFromRCNomPts = []
             l_RMSDevFromRCNomPts.append(0)
@@ -77,6 +77,7 @@ class myCircleParameters:
     #--------------------------------------------------------------------------
 
 
+    """
     #--------------------------------------------------------------------------
     def SetXYRadialDistances(self):
         #l_GeneralFunctions.PrintMethodSTART("myCircleParameters.SetXYRadialDistances()", "=", 1, 0)
@@ -96,6 +97,15 @@ class myCircleParameters:
 
         #l_GeneralFunctions.PrintMethodEND("myCircleParameters.SetXYRadialDistances()", "=", 0, 0)
     #--------------------------------------------------------------------------
+    """
+    #--------------------------------------------------------------------------
+    # Copilot-suggested optimization
+    def SetXYRadialDistances(self):
+        points = np.array(self.m_PointData)[:, :2]  # Extract only X and Y columns
+        diffs = points - np.array([self.m_NominalCentreX, self.m_NominalCentreY])
+        radial_distances = np.sqrt(np.sum(diffs**2, axis=1))
+        self.m_XYRadialDistancesNomCentre = radial_distances.tolist()
+    #--------------------------------------------------------------------------
 
 
     #--------------------------------------------------------------------------
@@ -105,6 +115,7 @@ class myCircleParameters:
     #--------------------------------------------------------------------------
 
 
+    """
     #--------------------------------------------------------------------------
     def SetXYRootMeanSquareDeviationFromFixedRadius( self
                                                    , a_FixedRadius
@@ -118,6 +129,16 @@ class myCircleParameters:
 
         l_MeanSquaredDeviation = l_SumSquaredDeviations / len(self.m_XYRadialDistancesNomCentre)
         a_RMSList[0] = math.sqrt(l_MeanSquaredDeviation);
+    #--------------------------------------------------------------------------
+    """
+    #--------------------------------------------------------------------------
+    # Copilot-suggested optimization
+    def SetXYRootMeanSquareDeviationFromFixedRadius( self
+                                                   , a_FixedRadius
+                                                   , a_RMSList):
+        deviations = np.array(self.m_XYRadialDistancesNomCentre) - a_FixedRadius
+        rms = np.sqrt(np.mean(deviations**2))
+        a_RMSList[0] = rms
     #--------------------------------------------------------------------------
 
 
@@ -146,6 +167,7 @@ class myCircleParameters:
         self.m_RMSDevFromFittedRadius = l_List[0]
     #--------------------------------------------------------------------------
     
+    """
     #--------------------------------------------------------------------------
     def SetRMSDevPointToPoint( self
                              , a_PointDataForComparison
@@ -168,6 +190,16 @@ class myCircleParameters:
 
         l_MeanRadialDifferenceSquared = l_SumRSquared / len(self.m_PointData)
         a_RMS[0] = math.sqrt(l_MeanRadialDifferenceSquared)
+    #--------------------------------------------------------------------------
+    """
+    #--------------------------------------------------------------------------
+    def SetRMSDevPointToPoint(self, a_PointDataForComparison, a_RMS):
+        points1 = np.array(self.m_PointData)[:, :2]  # Extract X, Y
+        points2 = np.array(a_PointDataForComparison)[:, :2]  # Extract comparison X, Y
+
+        diffs = points1 - points2
+        rms = np.sqrt(np.mean(np.sum(diffs**2, axis=1)))
+        a_RMS[0] = rms
     #--------------------------------------------------------------------------
 
 
