@@ -1203,29 +1203,34 @@ class myModelMGR:
         l_TestingExampleRCNom = a_TestingExampleRCNom[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRCNom = myCircleParameters()
         l_CircleParametersRCNom.Initialise(l_TestingExampleRCNom, self.m_NominalRadius)
-        l_CircleParametersRCNom.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetCircleFittedParameters()
+        """
+        l_CircleParametersRCNom.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRCNom.SetCircularity()
-        l_CircleParametersRCNom.PrintAllValues("l_CircleParametersRCNom")
-
+        #l_CircleParametersRCNom.PrintAllValues("l_CircleParametersRCNom")
+        """
         # Raw
         l_TestingExampleRaw = a_TestingExampleRaw[0] # Need to reshape it back into 2D (num_rows x 6) from (1, num_rows, 6)
         l_CircleParametersRaw = myCircleParameters()
         l_CircleParametersRaw.Initialise(l_TestingExampleRaw, self.m_NominalRadius)
-        l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircleFittedParameters()
+        """
+        l_CircleParametersRaw.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersRaw.SetCircularity()
-        l_CircleParametersRaw.PrintAllValues("l_CircleParametersRaw")
+        #l_CircleParametersRaw.PrintAllValues("l_CircleParametersRaw")
+        """
 
         # Denoised
-        l_DenoisedPrediction = a_DenoisedPrediction[0]
+        #l_DenoisedPrediction = a_DenoisedPrediction[0]
+        l_DenoisedPrediction = a_DenoisedPrediction
         l_CircleParametersDenoised = myCircleParameters()
         l_CircleParametersDenoised.Initialise(l_DenoisedPrediction, self.m_NominalRadius)
-        l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersDenoised.SetCircleFittedParameters()
+        """
+        l_CircleParametersDenoised.SetAllRMSInfo(l_TestingExampleRCNom)
         l_CircleParametersDenoised.SetCircularity()
-        l_CircleParametersDenoised.PrintAllValues("l_CircleParametersDenoised")
-
+        #l_CircleParametersDenoised.PrintAllValues("l_CircleParametersDenoised")
+        """
         self.WriteResultsForCNNParameters( a_CNNParameters
                                          , l_CircleParametersRaw
                                          , l_CircleParametersRCNom
@@ -1411,6 +1416,10 @@ class myModelMGR:
         print("a_DenoisedPredictions.shape:", a_DenoisedPredictions.shape)
 
         for l_ExampleInBatchIndex in range(0, a_TestingBatchSize):
+            print("l_ExampleInBatchIndex:", l_ExampleInBatchIndex)
+            print("Total testing examples written for:", a_NumTestingExamplesHandled + l_ExampleInBatchIndex)
+
+
             #l_CurrentDenoisedPrediction = a_DenoisedPredictions[l_ExampleInBatchIndex]
             l_TestingSetIndex = a_NumTestingExamplesHandled + l_ExampleInBatchIndex
             l_ExampleIndex = self.m_DataSetMGR.m_ListOfTestingExampleIndices[l_TestingSetIndex]
@@ -1444,8 +1453,11 @@ class myModelMGR:
                                               , a_MeanDenoisingTimeTaken
                                               , a_DateTimeStampCurrentBatchTest
                                               , a_ExampleInBatchIndex):
+        l_GeneralFunctions.PrintMethodSTART("WriteSingleTestingExampleResultsToFile()", "=", 1, 0)
 
         # Write the denoised prediction to file and read in the raw and RCNom data for circle parameter calculations
+        l_DenoisedPrediction = a_DenoisedPredictions[a_ExampleInBatchIndex]
+        #print("l_DenoisedPrediction.shape:", l_DenoisedPrediction.shape)
 
         #l_FilePathRawData = self.m_FilePathsRawData[a_ExampleIndex]
         l_FilePathRawData = self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex]
@@ -1467,7 +1479,7 @@ class myModelMGR:
         l_DenoisedExampleFullPath  = l_DirCNNIndex + l_FileName
 
         #l_DenoisedPredictionPandasDF = pd.DataFrame(a_DenoisedPredictions[0]) # Need a Pandas dataframe, not a Numpy dataframe
-        l_DenoisedPredictionPandasDF = pd.DataFrame(a_DenoisedPredictions[a_ExampleInBatchIndex]) # Need a Pandas dataframe, not a Numpy dataframe
+        l_DenoisedPredictionPandasDF = pd.DataFrame(l_DenoisedPrediction) # Need a Pandas dataframe, not a Numpy dataframe
         l_ColumnWidths = [10, 10, 10, 10, 10, 10]
         l_DenoisedPredictionPandasDF = l_DenoisedPredictionPandasDF.round(6)
 
@@ -1500,14 +1512,12 @@ class myModelMGR:
                                                              , self.m_DataSetMGR.m_NumFeaturesPerPoint)
 
 
-        print("\nRaw data frame first 3 rows:\n", l_FilePathRawData)
-        print(l_TestingExampleRaw[0, 0:3, :])
-        print("\nRCNom data frame first 3 rows:\n", l_FilePathRCNomData)
-        print(l_TestingExampleRCNom[0, 0:3, :])
-        print("\nDenoised prediction first 3 rows:\n", l_DenoisedExampleFullPath)
-        #print(a_DenoisedPrediction[0, 0:3, :])
-        #print(a_DenoisedPrediction[0:3, :])
-        print(a_DenoisedPredictions[a_ExampleInBatchIndex, 0:3, :])
+        #print("\nRaw data frame first 3 rows:\n", l_FilePathRawData)
+        #print(l_TestingExampleRaw[0, 0:3, :])
+        #print("\nRCNom data frame first 3 rows:\n", l_FilePathRCNomData)
+        #print(l_TestingExampleRCNom[0, 0:3, :])
+        #print("\nDenoised prediction first 3 rows:\n", l_DenoisedExampleFullPath)
+        #print(l_DenoisedPrediction[0:3, :])
 
         if isinstance(l_TestingExampleRaw, tf.Tensor):
             l_TestingExampleRaw = l_TestingExampleRaw.numpy()  # Convert to NumPy
@@ -1517,7 +1527,7 @@ class myModelMGR:
         self.SetAndWriteFittedParameters( l_TestingExampleRaw
                                         , l_TestingExampleRCNom
                                         #, a_DenoisedPrediction
-                                        , a_DenoisedPredictions[a_ExampleInBatchIndex]
+                                        , l_DenoisedPrediction
                                         , a_CNNParameters
                                         , a_ModelBuildingTime
                                         , a_ModelTrainingTime
@@ -1528,5 +1538,7 @@ class myModelMGR:
                                         , a_DateTimeStampCurrentBatchTest
                                         , self.m_DataSetMGR.m_DateTimeStampOverall
                                         , a_CurrentHyperParameterSet)
+
+        l_GeneralFunctions.PrintMethodEND("WriteSingleTestingExampleResultsToFile()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
