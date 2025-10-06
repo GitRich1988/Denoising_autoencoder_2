@@ -57,8 +57,10 @@ class myModelMGR:
     def Initialise(self):
         l_GeneralFunctions.PrintMethodSTART("myModelMGR.Initialise()", "=", 0, 0)
 
-        self.m_DirHyperParameterSets = "Training_info/Hyper_parameters/"
-        self.m_DirCNNDefinitions = "Training_info/CNN_definitions/"
+        #self.m_DirHyperParameterSets = "Training_info/Hyper_parameters/"
+        #self.m_DirCNNDefinitions = "Training_info/CNN_definitions/"
+        self.m_DirHyperParameterSets = l_ProjectInfo.GetDirTrainingInfo() + "Hyper_parameters/"
+        self.m_DirCNNDefinitions = l_ProjectInfo.GetDirTrainingInfo() + "CNN_definitions/"
         self.m_RandomSeedNumpy = 42
         self.m_RandomSeedRandom = 42
         self.m_RandomSeedTensorflow = 42
@@ -523,6 +525,7 @@ class myModelMGR:
         return a_TrainOneCNNList
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
+
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def LoadRawAndRCNomFilePair(self, raw_path, nominal_path, a_NumFilePairsLoaded = -1):
         #tf.print("===== START OF LoadRawAndRCNomFilePair() =====")
@@ -656,7 +659,6 @@ class myModelMGR:
 
         l_GeneralFunctions.PrintMethodEND("TestOneCNNOnSingleExample_GPUVersion()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

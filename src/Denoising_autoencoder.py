@@ -19,7 +19,8 @@ def main():
 
     l_ProjectInfo.Setup()
     l_DataSetMGR = myDataSetMGR("1000_scans__SphereCsy__EqX_4__ScanParSpeed_25")
-    l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_1.json", "Hyper_parameters_1.json")
+    #l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_1.json", "Hyper_parameters_1.json")
+    l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_2.json", "Hyper_parameters_1.json")
     l_ModelMGR.Run()
 
     l_GeneralFunctions.PrintMethodEND("main()", "=", 0, 0)
