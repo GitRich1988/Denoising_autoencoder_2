@@ -3,7 +3,7 @@
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
-from src.myCircleParameters.myCircleParameters import myCircleParameters 
+from src.myCircleParameters.myCircleParameters import myCircleParameters
 
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1" # this is an attempt to ensure a CNN trains to identical weights each time I run the program
@@ -135,15 +135,19 @@ class myModelMGR:
                 l_ModelTrainingTime = l_ModelAndTimes[2]
 
                 # Test the model on a single example
-                """
+                #"""
                 l_ExampleIndex = 0
-                self.TestOneCNNOnSingleExample_GPUVersion( l_AutoEncoder
+                #self.TestOneCNNOnSingleExample_GPUVersion( l_AutoEncoder
+                self.TestOneCNNOnSingleExample_GPUVersion_2( l_AutoEncoder
                                                          , l_CurrentCNNDefinition
                                                          , l_ModelBuildingTime
                                                          , l_ModelTrainingTime
                                                          , l_ExampleIndex
                                                          , l_CNNIndex
                                                          , l_CurrentHyperParameterSet)
+                #"""
+
+                # Test the model on batches of examples
                 """
                 self.TestOneCNNOnBatches_GPUVersion( l_AutoEncoder
                                                    , l_CurrentCNNDefinition
@@ -151,7 +155,7 @@ class myModelMGR:
                                                    , l_ModelTrainingTime
                                                    , l_CNNIndex
                                                    , l_CurrentHyperParameterSet)
-                
+                """
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.Run()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -267,7 +271,7 @@ class myModelMGR:
             l_AutoEncoder = None
             l_ModelBuildingTime = 0
             [l_AutoEncoder, l_ModelBuildingTime] = self.BuildOneCNN( l_CNNArchitecture
-                                                                   , a_HyperParameterSet) 
+                                                                   , a_HyperParameterSet)
 
         l_GeneralFunctions.PrintMethodEND("myModelMGR.DefineAndBuildOneCNN()", "=", 0, 0)
         return [l_AutoEncoder, l_ModelBuildingTime]
@@ -488,7 +492,7 @@ class myModelMGR:
         # Set the batches
         #train_dataset = train_dataset.batch(self.m_HyperParameters.m_BatchSize)
         train_dataset = train_dataset.batch(int(a_HyperParameterSet[0]["TrainingBatchSize"]))
-        
+
 
         # Now fit the model
         #self.ResetAllRandomSeeds(self.m_RandomSeed)
@@ -649,7 +653,7 @@ class myModelMGR:
 
             #l_ExampleFolder = self.m_DirDataSets + "Csy_" + str(a_ExampleIndex) + "/"
             l_ExampleFolder = self.m_DataSetMGR.m_DirPointData + "Csy_" + str(a_ExampleIndex) + "/"
-            
+
             l_DenoisedExampleFolder = l_ExampleFolder + "Denoised_data/"
             l_GeneralFunctions.MakeDirIfNonExistent(l_DenoisedExampleFolder)
             l_DateTimeStampDenoisedFileFolder = l_DenoisedExampleFolder + self.m_DataSetMGR.m_DateTimeStampOverall + "/"
@@ -673,7 +677,7 @@ class myModelMGR:
             # Read in RCNom data
             #l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoDataframe(l_FilePathRCNomData)
             l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_FilePathRCNomData)
-            
+
             l_TestingExampleRCNom = l_TestingExampleRCNom.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
             l_TestingExampleRCNom = l_TestingExampleRCNom.to_numpy()
             l_TestingExampleRCNom = l_TestingExampleRCNom.reshape( 1
@@ -711,6 +715,84 @@ class myModelMGR:
 
         l_GeneralFunctions.PrintMethodEND("TestOneCNNOnSingleExample_GPUVersion()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def TestOneCNNOnSingleExample_GPUVersion_2( self
+                                                , a_AutoEncoder
+                                                , a_CNNParameters
+                                                , a_ModelBuildingTime
+                                                , a_ModelTrainingTime
+                                                , a_ExampleIndex
+                                                , a_CNNIndex
+                                                , a_CurrentHyperParameterSet):
+        l_GeneralFunctions.PrintMethodSTART("TestOneCNNOnSingleExample_GPUVersion()", "=", 1, 0)
+
+        # !!! CAN MOVE RESULTS-WRITING STUFF OUT INTO A myResultsMGR CLASS LATER?
+
+        with tf.device('/GPU:0'):
+            # Read in the raw example point data - this part could be done with GPU, could improve later
+            #l_FilePathsRawDataSingleFile = []
+            #l_FilePathsRawDataSingleFile.append(self.m_FilePathsRawData[a_ExampleIndex]);
+            l_TestingBatchSize = 1
+
+            #"""
+            l_RawDataFullPath = self.m_DataSetMGR.m_ListOfPointDataFullPathsRawAll[a_ExampleIndex]
+            l_TestingExampleRaw = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_RawDataFullPath, a_Header=None)
+            print("l_TestingExampleRaw.shape:\n", l_TestingExampleRaw.shape)
+
+            l_TestingExampleRaw = l_TestingExampleRaw.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
+            l_TestingExampleRaw = l_TestingExampleRaw.to_numpy()
+            l_TestingExampleRaw = l_TestingExampleRaw.reshape( 1
+                                                             , self.m_DataSetMGR.m_NumRowsPerExampleDataFrame
+                                                             , self.m_DataSetMGR.m_NumFeaturesPerPoint)
+            #l_TestingExampleRaw = tf.convert_to_tensor(l_TestingExampleRaw, dtype=tf.float64)
+            l_TestingExampleRaw = tf.convert_to_tensor(l_TestingExampleRaw, dtype=tf.float32)
+            #"""
+
+            l_DateTimeStampCurrentTest = l_GeneralFunctions.GetCurrentDateTimeStamp()
+
+            # run the example's raw data through the CNN and get the denoised prediction
+            l_DenoisingTimeStart = time.time()
+
+            #l_DenoisedPrediction = a_AutoEncoder(l_TestingExampleRaw) # slightly less overhead than .predict() way
+            #l_DenoisedPrediction = a_AutoEncoder.predict(l_TestingExampleRaw, training=False)  # 26/06/2025 - added training=False - Returns output as a NumPy array, not a tf.Tensor.
+            #l_DenoisedPrediction = a_AutoEncoder.predict(l_TestingExampleRaw)  # 26/06/2025 - added training=False - Returns output as a NumPy array, not a tf.Tensor.
+
+            l_DenoisedPrediction = None
+            l_CountFailedPredictions = 0
+            l_HasNANInFirstRow = True
+            while l_HasNANInFirstRow == True:
+                l_DenoisedPrediction = a_AutoEncoder.predict(l_TestingExampleRaw)
+                l_HasNANInFirstRow = np.isnan(l_DenoisedPrediction[0, :]).any()
+                if(l_HasNANInFirstRow == True):
+                    l_CountFailedPredictions += 1
+                if l_CountFailedPredictions > 10:
+                    break
+            if l_HasNANInFirstRow:
+                return
+
+
+            print("\n--> l_DenoisedPrediction.shape:", l_DenoisedPrediction.shape)
+            l_DenoisingTimeEnd = time.time()
+            l_DenoisingTimeTaken = l_DenoisingTimeEnd - l_DenoisingTimeStart
+            print("--> Time taken make current denoised prediction:", l_DenoisingTimeTaken)
+
+
+            self.WriteSingleTestingExampleResultsToFile( l_DenoisedPrediction
+                                                       , a_ExampleIndex
+                                                       , a_CNNIndex
+                                                       , a_CNNParameters
+                                                       , a_ModelBuildingTime
+                                                       , a_ModelTrainingTime
+                                                       , a_CurrentHyperParameterSet
+                                                       , l_DenoisingTimeTaken
+                                                       , l_DateTimeStampCurrentTest
+                                                       , 0)
+
+        l_GeneralFunctions.PrintMethodEND("TestOneCNNOnSingleExample_GPUVersion()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -886,7 +968,7 @@ class myModelMGR:
 
                 #round(a_CircleParametersDenoised.m_MeanXYRadialDistance, 8),
                 round(a_CircleParametersDenoised.m_XYRadialMean, 8),
-                
+
                 #round(a_CircleParametersDenoised.m_XYRMSDevFromOwnMean, 8),
                 #round(a_CircleParametersDenoised.m_XYRMSDevFromRCNomPts, 8),
                 round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8),
@@ -950,7 +1032,7 @@ class myModelMGR:
                                                     , a_CurrentHyperParameterSet)
 
             l_JSON = {}
-            self.SetJSONOutputSingleExample( l_JSON                              
+            self.SetJSONOutputSingleExample( l_JSON
                                            , a_DateTimeStampOverall
                                            , a_DateTimeStampCurrentCNN
                                            , a_CurrentHyperParameterSet
@@ -1292,14 +1374,14 @@ class myModelMGR:
 
         # Mean XY radial distance of points from nominal centre
         a_JSON['MeanXYRadialDist_Raw']          = round(a_CircleParametersRaw.m_XYRadialMean, 8)
-        a_JSON['MeanXYRadialDist_RCNom']        = round(a_CircleParametersRCNominal.m_XYRadialMean, 8)       
+        a_JSON['MeanXYRadialDist_RCNom']        = round(a_CircleParametersRCNominal.m_XYRadialMean, 8)
         a_JSON['MeanXYRadialDist_Denoised']     = round(a_CircleParametersDenoised.m_XYRadialMean, 8)
 
         # RMS deviation from nominal radius
         a_JSON['RMSDevFromNomRadius_Raw']       = round(a_CircleParametersRaw.m_RMSDevFromNomRadius, 6)
         a_JSON['RMSDevFromNomRadius_RCNom']     = round(a_CircleParametersRCNominal.m_RMSDevFromNomRadius , 6)
         a_JSON['RMSDevFromNomRadius_Denoised']  = round(a_CircleParametersDenoised.m_RMSDevFromNomRadius, 6)
-        
+
         # RMS deviation from fitted radius
         a_JSON['RMSDevFromFittedRadius_Raw']    = round(a_CircleParametersRaw.m_RMSDevFromFittedRadius, 6)
         a_JSON['RMSDevFromFittedRadius_RCNom']  = round(a_CircleParametersRCNominal.m_RMSDevFromFittedRadius, 6)
@@ -1309,7 +1391,7 @@ class myModelMGR:
         a_JSON['RMSDevFromXYRadialMean_Raw']    = round(a_CircleParametersRaw.m_RMSDevFromXYRadialMean, 8)
         a_JSON['RMSDevFromXYRadialMean_RCNom']  = round(a_CircleParametersRCNominal.m_RMSDevFromXYRadialMean, 8)
         a_JSON['RMSDevFromXYRadialMean_Denoised'] = round(a_CircleParametersDenoised.m_RMSDevFromXYRadialMean, 8)
-        
+
         # RMS deviation of points from corresponding RCNom points
         a_JSON['RMSDevFromRCNomPts_Raw']        = round(a_CircleParametersRaw.m_RMSDevFromRCNomPts, 8)
         a_JSON['RMSDevFromRCNomPts_RCNom']      = round(a_CircleParametersRCNominal.m_RMSDevFromRCNomPts, 8)
@@ -1334,43 +1416,43 @@ class myModelMGR:
 
         l_TestingBatchSize = int(a_CurrentHyperParameterSet[0]["TestingBatchSize"])
 
-        print("l_TestingBatchSize:", l_TestingBatchSize) 
-        #l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_FilePathsRawDataTesting) 
-        l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting) 
+        print("l_TestingBatchSize:", l_TestingBatchSize)
+        #l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_FilePathsRawDataTesting)
+        l_TestDataset = tf.data.Dataset.from_tensor_slices(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting)
         print("len(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting):", len(self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting))
         print("m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting[0]:\n", self.m_DataSetMGR.m_ListOfPointDataFullPathsRawTesting[0])
 
         l_TestDataset = l_TestDataset.map(self.load_and_parse).batch(l_TestingBatchSize)
-        # Do I really need to use the same batch size for testing as I have used for training? 
-        # # Probably not, but it is easier to keep it the same for now. 
-        
-        with tf.device('/GPU:0'): 
-            l_NumTestingExamplesHandled = 0 
-            l_BatchIndex = 0 
-            for l_CurrentBatch in l_TestDataset: 
-                l_BatchIndex += 1 
+        # Do I really need to use the same batch size for testing as I have used for training?
+        # # Probably not, but it is easier to keep it the same for now.
 
-                #if(l_BatchIndex > 1): 
-                    # TESTING ONLY 
-                    # break 
-                    
-                print("--> l_BatchIndex =", l_BatchIndex, " - l_NumTestingExamplesHandled =", l_NumTestingExamplesHandled) 
-                #print("--> l_CurrentBatch.shape:", l_CurrentBatch.shape) 
-                
-                # Train on current training batch... 
-                #print("--> Passing current batch of testing set examples to trained model now to make predictions on...") 
+        with tf.device('/GPU:0'):
+            l_NumTestingExamplesHandled = 0
+            l_BatchIndex = 0
+            for l_CurrentBatch in l_TestDataset:
+                l_BatchIndex += 1
+
+                #if(l_BatchIndex > 1):
+                # TESTING ONLY
+                # break
+
+                print("--> l_BatchIndex =", l_BatchIndex, " - l_NumTestingExamplesHandled =", l_NumTestingExamplesHandled)
+                #print("--> l_CurrentBatch.shape:", l_CurrentBatch.shape)
+
+                # Train on current training batch...
+                #print("--> Passing current batch of testing set examples to trained model now to make predictions on...")
                 l_DateTimeStampCurrentBatchTest = l_GeneralFunctions.GetCurrentDateTimeStamp()
                 l_BatchDenoisingTimeStart = time.time()
-                l_DenoisedPredictions = a_AutoEncoder(l_CurrentBatch) 
-                l_BatchDenoisingTimeEnd = time.time() 
-                l_BatchDenoisingTimeTaken = l_BatchDenoisingTimeEnd - l_BatchDenoisingTimeStart 
-                l_MeanDenoisedPredictionTimeTakenPerExampleInBatch = l_BatchDenoisingTimeTaken / l_TestingBatchSize 
-                #print("--> Time taken to make denoised predictions on current testing batch:", l_BatchDenoisingTimeTaken) 
-                #print("--> Mean time taken to predict denoised result for one example in batch:", l_MeanDenoisedPredictionTimeTakenPerExampleInBatch) 
-                #print("--> Will now calculate fitted circle parameters for Raw, RCNom, Denoised circles and write to file...") 
-                #print("\nl_DenoisedPredictions[0].shape:", l_DenoisedPredictions[0].shape) 
-                #print("l_DenoisedPredictions[0, 0:3,:]:\n",l_DenoisedPredictions[0, 0:3,:]) 
-                #print("\nl_DenoisedPredictions[1].shape:", l_DenoisedPredictions[1].shape) 
+                l_DenoisedPredictions = a_AutoEncoder(l_CurrentBatch)
+                l_BatchDenoisingTimeEnd = time.time()
+                l_BatchDenoisingTimeTaken = l_BatchDenoisingTimeEnd - l_BatchDenoisingTimeStart
+                l_MeanDenoisedPredictionTimeTakenPerExampleInBatch = l_BatchDenoisingTimeTaken / l_TestingBatchSize
+                #print("--> Time taken to make denoised predictions on current testing batch:", l_BatchDenoisingTimeTaken)
+                #print("--> Mean time taken to predict denoised result for one example in batch:", l_MeanDenoisedPredictionTimeTakenPerExampleInBatch)
+                #print("--> Will now calculate fitted circle parameters for Raw, RCNom, Denoised circles and write to file...")
+                #print("\nl_DenoisedPredictions[0].shape:", l_DenoisedPredictions[0].shape)
+                #print("l_DenoisedPredictions[0, 0:3,:]:\n",l_DenoisedPredictions[0, 0:3,:])
+                #print("\nl_DenoisedPredictions[1].shape:", l_DenoisedPredictions[1].shape)
                 #print("l_DenoisedPredictions[1, 0:3,:]:\n",l_DenoisedPredictions[1, 0:3,:])
 
                 # NEED TO IMPLEMENT WRITING RESULTS TO FILE HERE
@@ -1463,7 +1545,7 @@ class myModelMGR:
 
         #l_ExampleFolder = self.m_DirDataSets + "Csy_" + str(a_ExampleIndex) + "/"
         l_ExampleFolder = self.m_DataSetMGR.m_DirPointData + "Csy_" + str(a_ExampleIndex) + "/"
-            
+
         l_DenoisedExampleFolder = l_ExampleFolder + "Denoised_data/"
         l_GeneralFunctions.MakeDirIfNonExistent(l_DenoisedExampleFolder)
         l_DateTimeStampDenoisedFileFolder = l_DenoisedExampleFolder + self.m_DataSetMGR.m_DateTimeStampOverall + "/"
@@ -1498,7 +1580,7 @@ class myModelMGR:
         # Read in RCNom data
         #l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoDataframe(l_FilePathRCNomData)
         l_TestingExampleRCNom = l_GeneralFunctions.ReadFileIntoPandasDataframe(l_FilePathRCNomData)
-            
+
         l_TestingExampleRCNom = l_TestingExampleRCNom.iloc[:, :self.m_DataSetMGR.m_NumFeaturesPerPoint]
         l_TestingExampleRCNom = l_TestingExampleRCNom.to_numpy()
         l_TestingExampleRCNom = l_TestingExampleRCNom.reshape( 1
