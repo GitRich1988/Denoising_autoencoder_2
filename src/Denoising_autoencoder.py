@@ -12,12 +12,18 @@ from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
 from src.myDataSetMGR.myDataSetMGR import myDataSetMGR
 from src.myModelMGR.myModelMGR import myModelMGR
+from src.myInputParametersMGR.myInputParametersMGR import myInputParametersMGR
+
 
 #==============================================================================
 def main():
     l_GeneralFunctions.PrintMethodSTART("main()", "=", 1, 0)
 
     l_ProjectInfo.Setup()
+
+    l_InputParametersMGR = myInputParametersMGR()
+    l_InputParametersMGR.GenerateNumFiltersList(4, 30)
+
     l_DataSetMGR = myDataSetMGR("1000_scans__SphereCsy__EqX_4__ScanParSpeed_25")
     #l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_1.json", "Hyper_parameters_1.json")
     l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_2.json", "Hyper_parameters_1.json")
