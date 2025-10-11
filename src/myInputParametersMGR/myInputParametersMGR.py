@@ -1,12 +1,16 @@
 # src/myDataSetMGR/myInputParametersMGR.py
 
+from sre_constants import RANGE
 from src.myGeneralFunctions.myGeneralFunctions import myGeneralFunctions as l_GeneralFunctions
 from src.myProjectInfo.myProjectInfo import myProjectInfo
 l_ProjectInfo = myProjectInfo()
 
+from itertools import product
 
 #==============================================================================
 class myLimitPair:
+    
+    
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def __init__(self, a_LowerLimit, a_UpperLimit):
         self.m_LowerLimit = a_LowerLimit
@@ -17,6 +21,8 @@ class myLimitPair:
 
 #==============================================================================
 class myLimitPairsList:
+    
+    
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def __init__(self):
         self.m_List = []
@@ -27,17 +33,49 @@ class myLimitPairsList:
 #==============================================================================
 class myInputParametersMGR:
 
+
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def __init__( self):
         l_GeneralFunctions.PrintMethodSTART("myInputParametersMGR.__init__()", "=", 1, 0)
+
+        self.m_ListOfNumFiltersLists = []
+        self.m_ListOfKernelSizesLists = []
 
         l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.__init__()", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    def GenerateNumFiltersList(self, a_NumLayers, a_MaxNumFilters):
-        l_GeneralFunctions.PrintMethodSTART("myInputParametersMGR.GenerateNumFilterList()", "=", 1, 0)
+    def GenerateListOfNumFiltersLists(self, a_NumLayers, a_MaxNumFilters):
+        l_GeneralFunctions.PrintMethodSTART("myInputParametersMGR.GenerateListOfNumFiltersLists()", "=", 1, 0)
+
+        self.m_ListOfNumFiltersLists = self.GenerateListOfLists(a_NumLayers, a_MaxNumFilters)
+
+        for l_NumFiltersList in self.m_ListOfNumFiltersLists:
+            print(l_NumFiltersList)
+        print("len(self.m_ListOfNumFiltersLists):", len(self.m_ListOfNumFiltersLists))
+
+        l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.GenerateListOfNumFiltersLists()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def GenerateListOfKernelSizesLists(self, a_NumLayers, a_MaxKernelSizes):
+        l_GeneralFunctions.PrintMethodSTART("myInputParametersMGR.GenerateListOfKernelSizesLists()", "=", 1, 0)
+
+        self.m_ListOfKernelSizesLists = self.GenerateListOfLists(a_NumLayers, a_MaxKernelSizes)
+
+        for l_KernelSizesList in self.m_ListOfKernelSizesLists:
+            print(l_KernelSizesList)
+        print("len(self.m_ListOfKernelSizesLists):", len(self.m_ListOfKernelSizesLists))
+
+        l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.GenerateListOfKernelSizesLists()", "=", 0, 0)
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def GenerateListOfLists(self, a_NumLayers, a_MaxNumFilters):
+        l_GeneralFunctions.PrintMethodSTART("myInputParametersMGR.GenerateListOfLists()", "=", 1, 0)
 
         l_LimitPairsList = myLimitPairsList()
 
@@ -64,18 +102,16 @@ class myInputParametersMGR:
                 l_CurrentList.append(l_CurrentNumFilters)
 
             l_ListOfLists.append(l_CurrentList)
+            print("[",l_PairIndex,"] ",l_ListOfLists[l_PairIndex])
 
- 
-        l_ListOfNumFiltersLists = []
-        l_TempNumFiltersList = []
-        self.DisplayNumberList(l_ListOfLists, 0, l_ListOfNumFiltersLists, l_TempNumFiltersList) 
 
-        for i in range(0, len(l_ListOfNumFiltersLists)):
-            print("[",i,"] ",l_ListOfNumFiltersLists[i])
+        # Generate all combinations using itertools
+        l_Combinations = list(product(*l_ListOfLists))
 
-        l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.GenerateNumFiltersList()", "=", 0, 0)
+        l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.GenerateListOfLists()", "=", 0, 0)
+        return l_Combinations
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- 
+
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def DisplayLimitPairsList(self, a_LimitPairsList):
@@ -86,32 +122,5 @@ class myInputParametersMGR:
             print("(",l_PairIndex,")  [",l_CurrentLimitPair.m_LowerLimit,",",l_CurrentLimitPair.m_UpperLimit,"]")
 
         l_GeneralFunctions.PrintMethodEND("myInputParametersMGR.DisplayNumFiltersList()", "=", 0, 0)
-    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-
-    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    def DisplayNumberList(self, a_ListOfLists, a_ListIndex, a_ListOfNumFiltersLists, a_TempNumFiltersList):
-        l_List = a_ListOfLists[a_ListIndex]
-        l_ListIndex = a_ListIndex
-
-        l_Spaces = ""
-        for i in range(0, l_ListIndex):
-            l_Spaces += " "
-
-        l_CurrentNumber = -1
-        for l_Index in range(0, len(l_List)):
-            l_CurrentNumber = l_List[l_Index]
-            #print(l_Spaces, l_CurrentNumber)
-            
-            l_NextListIndex = l_ListIndex + 1
-            if l_NextListIndex < len(a_ListOfLists):
-                a_TempNumFiltersList.append(l_CurrentNumber)
-                self.DisplayNumberList(a_ListOfLists, l_NextListIndex, a_ListOfNumFiltersLists, a_TempNumFiltersList)
-            
-            if l_NextListIndex == len(a_ListOfLists) - 1:
-                a_ListOfNumFiltersLists.append(a_TempNumFiltersList)
-                a_TempNumFiltersList = []  
-                
-         return l_CurrentNumber
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================
