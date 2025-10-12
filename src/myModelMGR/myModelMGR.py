@@ -86,12 +86,19 @@ class myModelMGR:
 
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     def SetListOfCNNDefinitions(self):
+        l_GeneralFunctions.PrintMethodSTART("myModelMGR.SetListOfCNNDefinitions", "=", 0, 0)
 
         l_FullPathCNNDefinitionsFile = self.m_DirCNNDefinitions + self.m_FileNameCNNDefinition
 
         with open(l_FullPathCNNDefinitionsFile, 'r') as f:
-            l_JSONData = json.load(f)
-            self.m_ListOfCNNDefinitions.append(l_JSONData)
+            l_JSONDataEntireFile = json.load(f) 
+
+            for l_CNNDefBlock in l_JSONDataEntireFile:
+                self.m_ListOfCNNDefinitions.append(l_CNNDefBlock)
+
+        print("len(self.m_ListOfCNNDefinitions):", len(self.m_ListOfCNNDefinitions))
+
+        l_GeneralFunctions.PrintMethodEND("myModelMGR.SetListOfCNNDefinitions", "=", 0, 0)
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -221,13 +228,15 @@ class myModelMGR:
                             , a_HyperParameterSet):
         l_GeneralFunctions.PrintMethodSTART("myModelMGR.DefineAndBuildOneCNN()", "=", 1, 0)
 
-        l_NumFiltersListStr = a_CNNDefinition[0]["NumFiltersList"]
+        #l_NumFiltersListStr = a_CNNDefinition[0]["NumFiltersList"]
+        l_NumFiltersListStr = a_CNNDefinition["NumFiltersList"]
         l_NumFiltersList = json.loads(l_NumFiltersListStr)
         #print("l_NumFiltersList:", l_NumFiltersList)
         for i in range(0, len(l_NumFiltersList)):
             print("l_NumFiltersList[", i, "]:", l_NumFiltersList[i])
 
-        l_KernelSizesListStr = a_CNNDefinition[0]["KernelSizesList"]
+        #l_KernelSizesListStr = a_CNNDefinition[0]["KernelSizesList"]
+        l_KernelSizesListStr = a_CNNDefinition["KernelSizesList"]
         l_KernelSizesList = json.loads(l_KernelSizesListStr)
         #print("l_KernelSizesList:", l_KernelSizesList)
         for i in range(0, len(l_KernelSizesList)):
@@ -698,7 +707,8 @@ class myModelMGR:
         l_GeneralFunctions.MakeDirIfNonExistent(l_DirDateTimeStamp)
 
         print("\na_CNNParameters:", a_CNNParameters)
-        l_NumFiltersFileEntry = a_CNNParameters[0]['NumFiltersList']
+        #l_NumFiltersFileEntry = a_CNNParameters[0]['NumFiltersList']
+        l_NumFiltersFileEntry = a_CNNParameters['NumFiltersList']
         l_NumFiltersList = ast.literal_eval(l_NumFiltersFileEntry)
         l_NumFiltersStr = ""
         for i in range(0, len(l_NumFiltersList)): # START FROM HERE TOMORROW
@@ -707,7 +717,8 @@ class myModelMGR:
                 l_NumFiltersStr += "-"
         print("l_NumFiltersStr:", l_NumFiltersStr)
 
-        l_KernelSizesFileEntry = a_CNNParameters[0]['KernelSizesList']
+        #l_KernelSizesFileEntry = a_CNNParameters[0]['KernelSizesList']
+        l_KernelSizesFileEntry = a_CNNParameters['KernelSizesList']
         l_KernelSizesList = ast.literal_eval(l_KernelSizesFileEntry)
         l_KernelSizesStr = ""
         for i in range(0, len(l_KernelSizesList)):
@@ -849,8 +860,10 @@ class myModelMGR:
                 round(a_ModelBuildingTime, 6),
                 round(a_ModelTrainingTime, 6),
                 round(a_ModelTestingTime, 6),
-                a_CurrentCNNParameters[0]['NumFiltersList'],
-                a_CurrentCNNParameters[0]['KernelSizesList']
+                #a_CurrentCNNParameters[0]['NumFiltersList'],
+                #a_CurrentCNNParameters[0]['KernelSizesList']
+                a_CurrentCNNParameters['NumFiltersList'],
+                a_CurrentCNNParameters['KernelSizesList']
             ]
 
             l_ColumnWidths = [21, 21, 5, 5, 10, 20,
@@ -1058,8 +1071,10 @@ class myModelMGR:
                           , a_CurrentHyperParameterSet[0]['LossFunction']
                           , a_CurrentHyperParameterSet[0]['Optimizer']
                           , l_CurrentQuantityValue
-                          , a_CurrentCNNParameters[0]['NumFiltersList']
-                          , a_CurrentCNNParameters[0]['KernelSizesList']
+                          #, a_CurrentCNNParameters[0]['NumFiltersList']
+                          #, a_CurrentCNNParameters[0]['KernelSizesList']
+                          , a_CurrentCNNParameters['NumFiltersList']
+                          , a_CurrentCNNParameters['KernelSizesList']
                           ]
 
             l_ColumnTitles = [ 'DateTimeOverall'
@@ -1215,8 +1230,10 @@ class myModelMGR:
         #a_JSON['Loss']                         = self.GetTableFriendlyLossFunction(self.m_HyperParameters.m_LossFunction)
         a_JSON['Loss']                          = a_CurrentHyperParameterSet[0]['LossFunction']
         a_JSON['Optimizer']                     = a_CurrentHyperParameterSet[0]['Optimizer']
-        a_JSON['Num_Filters']                   = a_CurrentCNNParameters[0]['NumFiltersList']
-        a_JSON['Kernel_Sizes']                  = a_CurrentCNNParameters[0]['KernelSizesList']
+        #a_JSON['Num_Filters']                   = a_CurrentCNNParameters[0]['NumFiltersList']
+        #a_JSON['Kernel_Sizes']                  = a_CurrentCNNParameters[0]['KernelSizesList']
+        a_JSON['Num_Filters']                   = a_CurrentCNNParameters['NumFiltersList']
+        a_JSON['Kernel_Sizes']                  = a_CurrentCNNParameters['KernelSizesList']
         a_JSON['Build_Time']                    = round(a_ModelBuildingTime, 6)
         a_JSON['Train_Time']                    = round(a_ModelTrainingTime, 6)
         a_JSON['Test_Time']                     = round(a_ModelTestingTime, 6)

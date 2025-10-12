@@ -246,4 +246,17 @@ class myInputParametersMGR:
 
         return l_Lines
     #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    def GenerateNewCNNDefinitionsFile(self):
+        #self.GenerateListOfNumFiltersLists(4, 30)
+        #self.GenerateListOfNumFiltersLists(3, 35)
+        l_NumFiltersRanges = [[25,35], [15,25], [5,15]]
+        self.GenerateListOfNumFiltersLists_2(l_NumFiltersRanges)
+        
+        #self.GenerateListOfKernelSizesLists(4, 3, 7)
+        self.GenerateListOfKernelSizesLists(3, 3, 3)
+        self.WriteCNNDefinitions()
+    #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #==============================================================================

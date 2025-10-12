@@ -1,7 +1,7 @@
 print("[IMPORT] from tensorflow.keras import mixed_precision")
 from tensorflow.keras import mixed_precision
 print("[IMPORT] mixed_precision.set_global_policy('float32')")
-mixed_precision.set_global_policy('float32') 
+mixed_precision.set_global_policy('float32')
 print("[IMPORT] from tensorflow.keras import layers")
 from tensorflow.keras import layers
 print("[IMPORT] from tensorflow.keras.models import Sequential")
@@ -21,20 +21,17 @@ def main():
 
     l_ProjectInfo.Setup()
 
-    l_InputParametersMGR = myInputParametersMGR()
+    # Only uncomment these lines if you want to generate new CNN definitions:
+    # (Can edit the upper and lower limits for the ranges of NumFilters and 
+    # KernelSizes for each layer in GenerateNewCNNDefinitionsFile())
+    #l_InputParametersMGR = myInputParametersMGR()
+    #l_InputParametersMGR.GenerateNewCNNDefinitionsFile()
     
-    #l_InputParametersMGR.GenerateListOfNumFiltersLists(4, 30)
-    #l_InputParametersMGR.GenerateListOfNumFiltersLists(3, 35)
-    l_NumFiltersRanges = [[25,35], [15,25], [5,15]]
-    l_InputParametersMGR.GenerateListOfNumFiltersLists_2(l_NumFiltersRanges)
-    #
-    #l_InputParametersMGR.GenerateListOfKernelSizesLists(4, 3, 7)
-    l_InputParametersMGR.GenerateListOfKernelSizesLists(3, 3, 3)
-    l_InputParametersMGR.WriteCNNDefinitions()
 
     l_DataSetMGR = myDataSetMGR("1000_scans__SphereCsy__EqX_4__ScanParSpeed_25")
     #l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_1.json", "Hyper_parameters_1.json")
-    l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_2.json", "Hyper_parameters_1.json")
+    #l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition_2.json", "Hyper_parameters_1.json")
+    l_ModelMGR = myModelMGR(l_DataSetMGR, "CNN_definition__2025-10-12--11-07-10.json", "Hyper_parameters_1.json")
     l_ModelMGR.Run()
 
     l_GeneralFunctions.PrintMethodEND("main()", "=", 0, 0)
